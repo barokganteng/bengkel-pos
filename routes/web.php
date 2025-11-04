@@ -8,12 +8,15 @@ use App\Livewire\TransactionCreate;
 use App\Livewire\TransactionList;
 use App\Livewire\BookingManagement;
 use App\Livewire\GalleryManagement;
+use App\Livewire\PublicHomepage;
+use App\Livewire\PublicGallery;
+use App\Livewire\PublicBookingForm;
 use Illuminate\Support\Facades\Auth;
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', PublicHomepage::class)->name('public.home');
+Route::get('/galeri-kami', PublicGallery::class)->name('public.gallery');
+Route::get('/booking-online', PublicBookingForm::class)->name('public.booking');
 
 Auth::routes();
 

@@ -1,0 +1,107 @@
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">Formulir Booking Online</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted text-center">Isi data di bawah ini untuk membuat janji servis.</p>
+
+                    @if (session()->has('message'))
+                        <div class="alert alert-success">
+                            {{ session('message') }}
+                        </div>
+                    @endif
+                    @if (session()->has('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    <form wire:submit.prevent="storeBooking">
+
+                        <h5 class="mt-4">1. Data Diri Anda</h5>
+                        <hr>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nama Lengkap</label>
+                            <input type="text" wire:model="name" class="form-control" id="name">
+                            @error('name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" wire:model="email" class="form-control" id="email">
+                                @error('email')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">No. WhatsApp</label>
+                                <input type_text wire:model="phone" class="form-control" id="phone"
+                                    placeholder="cth: 0812345...">
+                                @error('phone')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <h5 class="mt-4">2. Data Kendaraan</h5>
+                        <hr>
+                        <div class="mb-3">
+                            <label for="license_plate" class="form-label">Nomor Polisi</label>
+                            <input type="text" wire:model="license_plate" class="form-control" id="license_plate"
+                                placeholder="cth: G 1234 AB">
+                            @error('license_plate')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="brand" class="form-label">Merk Kendaraan</label>
+                                <input type="text" wire:model="brand" class="form-control" id="brand"
+                                    placeholder="cth: Honda">
+                                @error('brand')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="model" class="form-label">Model Kendaraan</label>
+                                <input type="text" wire:model="model" class="form-control" id="model"
+                                    placeholder="cth: Vario 150">
+                                @error('model')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <h5 class="mt-4">3. Rincian Servis</h5>
+                        <hr>
+                        <div class="mb-3">
+                            <label for="booking_date" class="form-label">Pilih Tanggal & Jam Booking</label>
+                            <input type="datetime-local" wire:model="booking_date" class="form-control"
+                                id="booking_date">
+                            @error('booking_date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="service_description" class="form-label">Keluhan atau Jenis Servis</label>
+                            <textarea wire:model="service_description" class="form-control" id="service_description" rows="3"
+                                placeholder="cth: Ganti oli, servis CVT, rem blong..."></textarea>
+                            @error('service_description')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Kirim Permintaan Booking</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
