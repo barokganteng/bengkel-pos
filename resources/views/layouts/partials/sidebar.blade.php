@@ -33,6 +33,12 @@
             <span>Riwayat Transaksi</span></a>
     </li>
 
+    <li class="nav-item {{ request()->routeIs('booking.index') ? 'active' : '' }}"> <a class="nav-link"
+            href="{{ route('booking.index') }}">
+            <i class="fas fa-fw fa-calendar-alt"></i>
+            <span>Manajemen Booking</span></a>
+    </li>
+
     <hr class="sidebar-divider">
 
     <div class="sidebar-heading">
