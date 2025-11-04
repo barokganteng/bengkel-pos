@@ -27,15 +27,13 @@
             <span>Pelanggan</span></a>
     </li>
 
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-box"></i>
+    <li class="nav-item {{ request()->routeIs('sparepart.index') ? 'active' : '' }}"> <a class="nav-link"
+            href="{{ route('sparepart.index') }}"> <i class="fas fa-fw fa-box"></i>
             <span>Spare Part</span></a>
     </li>
 
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-wrench"></i>
+    <li class="nav-item {{ request()->routeIs('service.index') ? 'active' : '' }}"> <a class="nav-link"
+            href="{{ route('service.index') }}"> <i class="fas fa-fw fa-wrench"></i>
             <span>Jasa Servis</span></a>
     </li>
 
