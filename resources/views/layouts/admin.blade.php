@@ -29,7 +29,11 @@
                 @include('layouts.partials.topbar')
                 <div class="container-fluid">
 
-                    {{ $slot }}
+                    @if (isset($slot))
+                        {{ $slot }}
+                    @else
+                        @yield('content')
+                    @endif
 
                 </div>
             </div>
