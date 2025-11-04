@@ -18,6 +18,18 @@
     <hr class="sidebar-divider">
 
     <div class="sidebar-heading">
+        Transaksi
+    </div>
+
+    <li class="nav-item {{ request()->routeIs('transaksi.create') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('transaksi.create') }}">
+            <i class="fas fa-fw fa-cash-register"></i>
+            <span>Kasir / Transaksi Baru</span></a>
+    </li>
+
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
         Data Master
     </div>
 

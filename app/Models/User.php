@@ -57,6 +57,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Scope a query to only include mechanics.
+     */
+    public function scopeMechanic(Builder $query): void
+    {
+        $query->where('role', 'mekanik');
+    }
+
+    /**
      * Get all of the vehicles for the User (Customer).
      */
     public function vehicles(): HasMany
