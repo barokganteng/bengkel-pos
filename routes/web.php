@@ -5,6 +5,8 @@ use App\Livewire\CustomerManagement;
 use App\Livewire\SparepartManagement;
 use App\Livewire\ServiceManagement;
 use App\Livewire\TransactionCreate;
+use App\Livewire\TransactionList;
+use App\Livewire\BookingManagement;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -23,5 +25,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('transaksi')->name('transaksi.')->group(function () {
         Route::get('/baru', TransactionCreate::class)->name('create');
+        Route::get('/', TransactionList::class)->name('index');
     });
+    Route::get('/booking', BookingManagement::class)->name('booking.index');
 });
