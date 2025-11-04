@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('phone')->nullable(); // Menambahkan no. HP
+            $table->enum('role', ['admin', 'mekanik', 'pelanggan']) // Menambahkan role
+                ->default('pelanggan');
             $table->rememberToken();
             $table->timestamps();
         });
