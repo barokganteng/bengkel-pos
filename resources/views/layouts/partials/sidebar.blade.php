@@ -39,6 +39,12 @@
             <span>Manajemen Booking</span></a>
     </li>
 
+    <li class="nav-item {{ request()->routeIs('gallery.index') ? 'active' : '' }}"> <a class="nav-link"
+            href="{{ route('gallery.index') }}">
+            <i class="fas fa-fw fa-images"></i>
+            <span>Manajemen Galeri</span></a>
+    </li>
+
     <hr class="sidebar-divider">
 
     <div class="sidebar-heading">

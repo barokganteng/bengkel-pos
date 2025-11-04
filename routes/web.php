@@ -7,6 +7,7 @@ use App\Livewire\ServiceManagement;
 use App\Livewire\TransactionCreate;
 use App\Livewire\TransactionList;
 use App\Livewire\BookingManagement;
+use App\Livewire\GalleryManagement;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -28,4 +29,5 @@ Route::middleware('auth')->group(function () {
         Route::get('/', TransactionList::class)->name('index');
     });
     Route::get('/booking', BookingManagement::class)->name('booking.index');
+    Route::get('/galeri', GalleryManagement::class)->name('gallery.index');
 });
