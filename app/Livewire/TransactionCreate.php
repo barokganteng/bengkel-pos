@@ -9,11 +9,23 @@ use App\Models\Service; // Model Jasa Servis
 use App\Models\Sparepart; // Model Sparepart
 use App\Models\ServiceHistory;
 use App\Models\ServiceDetail;
+use App\Jobs\SendNotaWaJob;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
+use Illuminate\Support\Facades\Hash;
+
 
 class TransactionCreate extends Component
 {
+    // Properti Modal Pelanggan Baru
+    public $isNewCustomerModalOpen = false;
+    public $new_name, $new_email, $new_phone;
+    public $new_password = 'password'; // Password default untuk pelanggan baru
+
+    // Properti Modal Kendaraan Baru
+    public $isNewVehicleModalOpen = false;
+    public $new_license_plate, $new_brand, $new_model, $new_year;
+
     // Bagian Pelanggan & Kendaraan
     public $customer_search = '';
     public $customers = []; // Hasil pencarian pelanggan
@@ -43,6 +55,95 @@ class TransactionCreate extends Component
     {
         // Langsung muat daftar mekanik
         $this->mechanics = User::mechanic()->get();
+    }
+
+    /**
+     * Membuka modal untuk menambah pelanggan baru
+     */
+    public function openNewCustomerModal()
+    {
+        $this->resetErrorBag(); // Bersihkan error validasi lama
+        $this->reset(['new_name', 'new_email', 'new_phone', 'new_password']);
+        $this->new_password = 'password'; // Set default
+        $this->isNewCustomerModalOpen = true;
+    }
+
+    /**
+     * Menyimpan pelanggan baru dari modal
+     */
+    public function saveNewCustomer()
+    {
+        // Validasi data pelanggan baru
+        $validated = $this->validate([
+            'new_name' => 'required|string|min:3',
+            'new_email' => 'required|email|unique:users,email',
+            'new_phone' => 'nullable|string',
+            'new_password' => 'required|min:6',
+        ]);
+
+        $customer = User::create([
+            'name' => $this->new_name,
+            'email' => $this->new_email,
+            'phone' => $this->new_phone,
+            'password' => Hash::make($this->new_password),
+            'role' => 'pelanggan'
+        ]);
+
+        // Tutup modal
+        $this->isNewCustomerModalOpen = false;
+
+        // LANGSUNG PILIH PELANGGAN YANG BARU DIBUAT
+        $this->selectCustomer($customer->id);
+
+        session()->flash('message', 'Pelanggan baru berhasil ditambahkan dan dipilih.');
+    }
+
+    /**
+     * Membuka modal untuk menambah kendaraan baru
+     * (Hanya bisa dipanggil jika pelanggan sudah dipilih)
+     */
+    public function openNewVehicleModal()
+    {
+        if (!$this->selected_customer_id) {
+            session()->flash('error', 'Pilih pelanggan terlebih dahulu.');
+            return;
+        }
+        $this->resetErrorBag();
+        $this->reset(['new_license_plate', 'new_brand', 'new_model', 'new_year']);
+        $this->isNewVehicleModalOpen = true;
+    }
+
+    /**
+     * Menyimpan kendaraan baru dari modal
+     */
+    public function saveNewVehicle()
+    {
+        // Validasi data kendaraan baru
+        $validated = $this->validate([
+            'new_license_plate' => 'required|string|unique:vehicles,license_plate',
+            'new_brand' => 'required|string',
+            'new_model' => 'required|string',
+            'new_year' => 'nullable|numeric|digits:4|min:1990',
+        ]);
+
+        $vehicle = Vehicle::create([
+            'user_id' => $this->selected_customer_id, // Link ke pelanggan yang dipilih
+            'license_plate' => strtoupper($this->new_license_plate),
+            'brand' => $this->new_brand,
+            'model' => $this->new_model,
+            'year' => $this->new_year,
+        ]);
+
+        // Tutup modal
+        $this->isNewVehicleModalOpen = false;
+
+        // Refresh daftar kendaraan untuk pelanggan ini
+        $this->vehicles = User::find($this->selected_customer_id)->vehicles;
+
+        // LANGSUNG PILIH KENDARAAN YANG BARU DIBUAT
+        $this->selected_vehicle_id = $vehicle->id;
+
+        session()->flash('message', 'Kendaraan baru berhasil ditambahkan dan dipilih.');
     }
 
     /**
@@ -270,11 +371,14 @@ class TransactionCreate extends Component
             // 5. Jika semua berhasil, commit transaksi
             DB::commit();
 
-            // 6. Reset state komponen dan kirim pesan sukses
+            // 6. Kirim job ke antiran
+            SendNotaWaJob::dispatch($serviceHistory->id);
+
+            // 7. Reset state komponen dan kirim pesan sukses
             session()->flash('message', 'Transaksi berhasil disimpan.');
             $this->resetAll();
         } catch (\Exception $e) {
-            // 7. Jika ada error, rollback semua
+            // 8. Jika ada error, rollback semua
             DB::rollBack();
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }

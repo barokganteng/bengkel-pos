@@ -1,41 +1,80 @@
 <div>
-    <div class="container-fluid bg-light p-5 text-center">
-        <h1 class="display-3">Selamat Datang di Bengkel Kami</h1>
-        <p class="lead">Solusi servis terbaik untuk kendaraan Anda. Profesional, cepat, dan terpercaya.</p>
-        <a href="#" class="btn btn-primary btn-lg">Booking Servis Sekarang</a>
+    <style>
+        .hero-section {
+            /* Ganti URL ini dengan gambar Anda. Simpan di public/img/ */
+            /* Anda bisa cari di Unsplash.com dengan kata kunci "motorcycle repair" */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1568605117036-505e7a7s82gA');
+            /* Contoh gambar */
+            background-size: cover;
+            background-position: center;
+            height: 60vh;
+            /* 60% dari tinggi layar */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+    </style>
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="display-3 fw-bold">Selamat Datang di Bengkel Kami</h1>
+            <p class="lead fs-4">Solusi servis terbaik untuk kendaraan Anda. Profesional, cepat, dan terpercaya.</p>
+            <a href="{{ route('public.booking') }}" class="btn btn-primary btn-lg mt-3">Booking Servis Sekarang</a>
+        </div>
     </div>
 
     <div class="container my-5">
+        <div class="row text-center mb-4">
+            <div class="col-12">
+                <h2>Layanan Kami</h2>
+                <p class="lead">Kami melayani berbagai kebutuhan servis kendaraan Anda.</p>
+            </div>
+        </div>
         <div class="row text-center">
-            <div class="col-md-4">
-                <i class="fas fa-fw fa-tachometer-alt fa-3x text-primary mb-3"></i>
-                <h4>Servis Cepat</h4>
-                <p class="text-muted">Layanan servis cepat tanpa mengurangi kualitas pengerjaan.</p>
-            </div>
-            <div class="col-md-4">
-                <i class="fas fa-fw fa-users-cog fa-3x text-primary mb-3"></i>
-                <h4>Mekanik Berpengalaman</h4>
-                <p class="text-muted">Dikerjakan oleh mekanik profesional dan bersertifikat.</p>
-            </div>
-            <div class="col-md-4">
-                <i class="fas fa-fw fa-box-open fa-3x text-primary mb-3"></i>
-                <h4>Sparepart Original</h4>
-                <p class="text-muted">Kami hanya menggunakan suku cadang asli dan berkualitas.</p>
-            </div>
+            @forelse ($services as $service)
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <i class="fas fa-fw fa-wrench fa-3x text-primary mb-3"></i>
+                            <h4 class="card-title">{{ $service->name }}</h4>
+                            <p class="card-text text-muted">Mulai dari Rp {{ number_format($service->price) }}</p>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="col-12">
+                    <p class="text-muted">Layanan akan segera diperbarui...</p>
+                </div>
+            @endforelse
         </div>
     </div>
 
     <div class="container-fluid bg-white p-5">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-6">
+                <div class="col-md-6 mb-4 mb-md-0">
                     <h2>Lihat Hasil Pekerjaan Kami</h2>
                     <p>Kami bangga dengan hasil pekerjaan kami. Lihat galeri untuk melihat kendaraan yang telah kami
                         tangani.</p>
-                    <a href="{{ route('public.gallery') }}" class="btn btn-outline-primary">Lihat Galeri</a>
+                    <a href="{{ route('public.gallery') }}" class="btn btn-outline-primary">Lihat Semua Galeri
+                        &rarr;</a>
                 </div>
                 <div class="col-md-6">
-
+                    @if ($latestGalleries->isEmpty())
+                        <p class="text-muted">Galeri akan segera diperbarui...</p>
+                    @else
+                        <div class="row">
+                            @foreach ($latestGalleries as $gallery)
+                                <div class="col-6 mb-3">
+                                    <img src="{{ asset('storage/' . $gallery->image_path) }}"
+                                        class="img-fluid rounded shadow-sm"
+                                        style="height: 150px; width: 100%; object-fit: cover;"
+                                        alt="{{ $gallery->caption ?? 'Galeri Bengkel' }}">
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -56,7 +95,6 @@
                     </iframe>
                 </div>
             </div>
-
             <div class="col-md-4">
                 <h4>Alamat Bengkel</h4>
                 <p>

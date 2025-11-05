@@ -20,6 +20,10 @@ class ServiceHistory extends Model
         'service_date',
     ];
 
+    protected $casts = [
+        'service_date' => 'date',
+    ];
+
     /**
      * Get the customer that owns the ServiceHistory.
      */

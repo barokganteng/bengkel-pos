@@ -22,7 +22,9 @@ class TransactionList extends Component
     public $selectedTransaction = null;
     public $details = [];
 
-    #[Layout('layouts.admin')]
+    #[Layout(
+        'layouts.admin'
+    )]
     public function render()
     {
         $query = ServiceHistory::query()
@@ -70,6 +72,26 @@ class TransactionList extends Component
             ->get();
 
         $this->isModalOpen = true;
+    }
+
+    /**
+     * Mengubah status transaksi
+     */
+    public function updateTransactionStatus($id, $status)
+    {
+        // Validasi status
+        $allowedStatus = ['pending', 'in_progress', 'done', 'paid'];
+        if (!in_array($status, $allowedStatus)) {
+            session()->flash('error', 'Status tidak valid.'); // Kirim pesan error
+            return;
+        }
+
+        $transaction = ServiceHistory::find($id);
+        if ($transaction) {
+            $transaction->status = $status;
+            $transaction->save();
+            session()->flash('message', 'Status transaksi #' . $id . ' berhasil diubah menjadi ' . $status);
+        }
     }
 
     /**

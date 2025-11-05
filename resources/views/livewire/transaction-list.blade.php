@@ -66,9 +66,44 @@
                                 <td>{{ $tx->mechanic->name ?? 'N/A' }}</td>
                                 <td>Rp {{ number_format($tx->total_price, 0, ',', '.') }}</td>
                                 <td><span class="badge bg-info text-white">{{ $tx->status }}</span></td>
+
                                 <td>
-                                    <button wire:click="showDetails({{ $tx->id }})"
-                                        class="btn btn-sm btn-info">Detail</button>
+                                    @php
+                                        $statusClass = 'btn-secondary'; // Default
+                                        if ($tx->status == 'pending') {
+                                            $statusClass = 'btn-warning text-dark';
+                                        }
+                                        if ($tx->status == 'in_progress') {
+                                            $statusClass = 'btn-info';
+                                        }
+                                        if ($tx->status == 'done') {
+                                            $statusClass = 'btn-success';
+                                        }
+                                        if ($tx->status == 'paid') {
+                                            $statusClass = 'btn-primary';
+                                        }
+                                    @endphp
+
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm dropdown-toggle {{ $statusClass }}" type="button"
+                                            data-toggle="dropdown">
+                                            {{ $tx->status }}
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="#"
+                                                wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'pending')">Set
+                                                Pending</a>
+                                            <a class="dropdown-item" href="#"
+                                                wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'in_progress')">Set
+                                                In Progress</a>
+                                            <a class="dropdown-item" href="#"
+                                                wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'done')">Set
+                                                Done</a>
+                                            <a class="dropdown-item" href="#"
+                                                wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'paid')">Set
+                                                Paid</a>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
