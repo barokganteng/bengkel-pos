@@ -1,59 +1,200 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Tentu, ini adalah draf `README.md` yang merangkum semua yang telah kita bangun. Ini dirancang agar jelas dan profesional untuk repositori Git Anda.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
+# Bengkel POS - Sistem Point of Sale Bengkel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**Bengkel POS** adalah aplikasi web modern yang dirancang untuk mengelola operasi harian bengkel (motor/mobil). Aplikasi ini dibangun sebagai proyek monolitik menggunakan _stack_ TALL (versi Blade/Bootstrap), yang membuatnya cepat, reaktif, dan mudah dikelola.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Aplikasi ini mencakup **Panel Admin** yang komprehensif untuk manajemen dan **Halaman Publik** untuk interaksi dengan pelanggan.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🚀 Fitur Utama
 
-## Learning Laravel
+Proyek ini dibagi menjadi dua bagian utama: Panel Admin (Backend) dan Halaman Publik (Frontend).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Panel Admin (Backend)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+-   **Dashboard Interaktif:**
 
-## Laravel Sponsors
+    -   Kartu statistik (Pendapatan Hari Ini, Total Pelanggan, Booking Pending, Stok Menipis).
+    -   Grafik pendapatan 7 hari terakhir (Chart.js).
+    -   Grafik 5 jasa servis terlaris (Chart.js).
+    -   Tabel 5 transaksi servis terbaru.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+-   **Manajemen Transaksi (POS):**
 
-### Premium Partners
+    -   Halaman Kasir untuk membuat transaksi servis baru.
+    -   Pencarian _real-time_ untuk pelanggan, jasa, dan sparepart.
+    -   Fitur **"Quick Add"**: Tambah pelanggan atau kendaraan baru langsung dari modal tanpa meninggalkan halaman kasir.
+    -   Manajemen keranjang (cart) dengan kalkulasi total otomatis.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+-   **Riwayat Transaksi:**
 
-## Contributing
+    -   Daftar semua transaksi dengan filter (pencarian, status, tanggal).
+    -   **Ubah Status Interaktif:** Ubah status transaksi (Pending, In Progress, Done, Paid) langsung dari tabel.
+    -   Modal "Detail Transaksi" untuk melihat rincian item.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+-   **Manajemen Data Master (CRUD):**
 
-## Code of Conduct
+    -   Manajemen Pelanggan
+    -   Manajemen Sparepart (termasuk manajemen stok)
+    -   Manajemen Jasa Servis
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+-   **Manajemen Booking:**
 
-## Security Vulnerabilities
+    -   Melihat dan mengelola booking yang masuk dari halaman publik.
+    -   Mengubah status booking (Pending, Confirmed, Cancelled, Completed).
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+-   **Manajemen Galeri:**
 
-## License
+    -   CRUD untuk galeri foto bengkel, lengkap dengan _preview upload_ file.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Halaman Publik (Frontend)
+
+-   **Homepage Dinamis:**
+
+    -   _Hero section_ modern dengan gambar latar.
+    -   Menampilkan daftar **Jasa Servis** secara dinamis dari database.
+    -   Menampilkan **4 Foto Galeri Terbaru** secara dinamis dari database.
+    -   **Geolocation:** Peta Google Maps (Embed) lokasi bengkel dan tombol "Buka di Maps".
+
+-   **Halaman Galeri:**
+
+    -   Menampilkan semua foto yang di-upload dari panel admin.
+
+-   **Formulir Booking Online:**
+
+    -   Formulir bagi pelanggan untuk mendaftarkan janji servis.
+    -   Sistem cerdas: Otomatis membuat pelanggan/kendaraan baru jika belum ada di database, atau menggunakan data yang sudah ada.
+
+### 🤖 Fitur Otomatisasi (WhatsApp Gateway)
+
+Integrasi penuh dengan WA Gateway (contoh: `kirimi.id`) untuk otomatisasi:
+
+1.  **Nota (Invoice) Otomatis:**
+
+    -   Menggunakan **Laravel Queues (Antrian)**.
+    -   Setelah transaksi disimpan, sistem otomatis membuat PDF nota dan mengirimkannya ke nomor WA pelanggan di latar belakang (tidak membuat admin menunggu).
+
+2.  **Bot Pengingat Servis:**
+
+    -   Menggunakan **Laravel Task Scheduling (Cron Job)**.
+    -   Setiap hari, sistem otomatis mengecek database dan mengirimkan WA pengingat ke pelanggan yang belum servis lebih dari 60 hari.
+
+## 🛠️ Teknologi yang Digunakan
+
+-   **Backend:** Laravel 11
+-   **Frontend:** Laravel Blade + Livewire 3
+-   **Styling:** Bootstrap 5 (Integrasi dengan `laravel/ui` dan template admin SB Admin 2)
+-   **Database:** MySQL
+-   **Fitur Tambahan:**
+    -   `barryvdh/laravel-dompdf` untuk generasi PDF.
+    -   `kirimi.id` (atau WA Gateway lain) untuk notifikasi.
+    -   Chart.js untuk grafik dashboard.
+    -   Laravel Queues (Driver: Database) untuk pengiriman nota.
+    -   Laravel Task Scheduling untuk bot pengingat.
+
+## ⚙️ Instalasi dan Setup
+
+1.  **Clone repositori:**
+
+    ```bash
+    git clone https://github.com/username/bengkel-pos.git
+    cd bengkel-pos
+    ```
+
+2.  **Instal dependensi:**
+
+    ```bash
+    composer install
+    npm install
+    ```
+
+3.  **Setup Lingkungan (.env):**
+
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
+
+4.  **Konfigurasi file `.env` Anda:**
+
+    ```env
+    # 1. Database
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=bengkel_pos
+    DB_USERNAME=root
+    DB_PASSWORD=
+
+    # 2. URL Aplikasi (PENTING untuk PDF & WA Gateway)
+    # Ganti dengan URL Ngrok Anda jika tes di lokal
+    APP_URL=http://localhost:8000
+
+    # 3. WA Gateway (kirimi.id)
+    KIRIMI_USER_CODE=...
+    KIRIMI_SECRET=...
+    KIRIMI_DEVICE_ID=...
+
+    # 4. Google Maps
+    GMAPS_SHARE_URL=...
+    GMAPS_EMBED_URL=...
+
+    # 5. Set Queue Driver ke database
+    QUEUE_CONNECTION=database
+    ```
+
+5.  **Migrasi dan Seeding Database:**
+
+    -   Buat _symlink_ agar file galeri/nota bisa diakses publik:
+        ```bash
+        php artisan storage:link
+        ```
+    -   Jalankan migrasi (termasuk tabel `jobs` untuk antrian) dan _seeder_ (untuk data dummy):
+        ```bash
+        php artisan migrate:fresh --seed
+        ```
+
+6.  **Kompilasi Aset:**
+
+    ```bash
+    npm run dev
+    ```
+
+## 🚀 Menjalankan Proyek
+
+Untuk menjalankan proyek ini, Anda perlu menjalankan **3 proses** di terminal terpisah:
+
+1.  **Terminal 1: Server Web**
+
+    ```bash
+    php artisan serve
+    ```
+
+2.  **Terminal 2: Queue Worker (Pekerja Antrian)**
+
+    -   (Wajib untuk mengirim nota WA)
+
+    <!-- end list -->
+
+    ```bash
+    php artisan queue:work
+    ```
+
+3.  **(Opsional) Ngrok untuk Tes WA Gateway di Lokal:**
+
+    ```bash
+    ngrok http 8000
+    ```
+
+    _(Jangan lupa update `APP_URL` di `.env` dengan URL Ngrok Anda)_
+
+## 🔑 Akun Admin (Dummy)
+
+Akun admin bawaan dari _seeder_:
+
+-   **Email:** `admin@bengkel.com`
+-   **Password:** `password`
+
+---
