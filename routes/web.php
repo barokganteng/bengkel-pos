@@ -35,9 +35,3 @@ Route::middleware('auth')->group(function () {
     Route::get('/booking', BookingManagement::class)->name('booking.index');
     Route::get('/galeri', GalleryManagement::class)->name('gallery.index');
 });
-
-Route::get('/last-service', function () {
-    $lastService = Vehicle::find(1)->latestService();
-
-    dd($lastService);
-});
