@@ -30,16 +30,20 @@ class SendServiceReminders extends Command
         Log::info('Job Pengingat Servis Dimulai.');
 
         // Tentukan batas waktu (misal: 60 hari yang lalu)
-        $reminderThreshold = Carbon::now()->subDays(60);
+        // $reminderThreshold = Carbon::now()->subDays(60);
+        $reminderThreshold = Carbon::now()->subMinutes(1);
         $count = 0;
 
         // Ambil SEMUA kendaraan, beserta relasi pelanggan dan servis terakhirnya
         // Eager loading sangat penting di sini
         $vehicles = Vehicle::with(['owner', 'latestService'])->get();
+        $this->info($vehicles->count());
+
 
         foreach ($vehicles as $vehicle) {
+
             // Cek 1: Apakah kendaraan ini punya pelanggan?
-            if (!$vehicle->customer) {
+            if (!$vehicle->owner) {
                 continue; // Lewati jika tidak ada data pelanggan
             }
 
@@ -56,23 +60,23 @@ class SendServiceReminders extends Command
 
                         // --- SEMUA SYARAT TERPENUHI, KIRIM WA! ---
 
-                        $message = "Halo " . $vehicle->customer->name . ",\n\n" .
+                        $message = "Halo " . $vehicle->owner->name . ",\n\n" .
                             "Kami dari " . config('app.name') . " ingin mengingatkan.\n" .
                             "Kendaraan Anda (" . $vehicle->license_plate . ") terakhir kali servis pada " . $lastServiceDate->format('d M Y') . ".\n\n" .
                             "Sudah waktunya untuk servis rutin. Ayo booking jadwal Anda sekarang!\n\n" .
                             "Terima kasih.";
 
                         try {
-                            $waService->sendText($vehicle->customer->phone, $message);
+                            $waService->sendMessage($vehicle->owner->phone, $message);
 
                             // UPDATE DATABASE agar tidak kirim spam
                             $vehicle->last_reminder_sent_at = Carbon::now();
                             $vehicle->save();
 
-                            $this->info('Mengirim pengingat ke: ' . $vehicle->customer->name);
+                            $this->info('Mengirim pengingat ke: ' . $vehicle->owner->name);
                             $count++;
                         } catch (\Exception $e) {
-                            $this->error('Gagal mengirim ke: ' . $vehicle->customer->name);
+                            $this->error('Gagal mengirim ke: ' . $vehicle->owner->name);
                             Log::error('Gagal kirim pengingat: ' . $e->getMessage());
                         }
                     }

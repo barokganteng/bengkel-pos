@@ -3,7 +3,7 @@
         .hero-section {
             /* Ganti URL ini dengan gambar Anda. Simpan di public/img/ */
             /* Anda bisa cari di Unsplash.com dengan kata kunci "motorcycle repair" */
-            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1568605117036-505e7a7s82gA');
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/img/hero.jpg');
             /* Contoh gambar */
             background-size: cover;
             background-position: center;

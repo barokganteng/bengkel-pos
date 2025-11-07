@@ -38,6 +38,8 @@ class SendNotaWaJob implements ShouldQueue
     public function handle(): void
     {
         try {
+            $waService = new WaService();
+
             // 1. Ambil semua data transaksi dari database
             $tx = ServiceHistory::with(['customer', 'vehicle', 'mechanic'])
                 ->findOrFail($this->serviceHistoryId);
@@ -68,11 +70,11 @@ class SendNotaWaJob implements ShouldQueue
                 "Terima kasih atas kepercayaan Anda.";
 
             // 6. Kirim WA menggunakan WaService
-            // $waService->sendDocument(
-            //     $tx->customer->phone, // Nomor HP pelanggan
-            //     $publicUrl,           // URL ke PDF
-            //     $caption              // Pesan
-            // );
+            $waService->sendMessage(
+                $tx->customer->phone, // Nomor HP pelanggan
+                $caption,              // Pesan
+                $publicUrl,           // URL ke PDF
+            );
 
             // 7. (Opsional) Catat jika berhasil
             Log::info("Nota WA berhasil terkirim untuk ServiceHistory ID: " . $tx->id);

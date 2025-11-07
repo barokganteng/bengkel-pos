@@ -40,7 +40,7 @@ class Vehicle extends Model
      * Get the latest service history record for the vehicle.
      * Ini adalah relasi untuk mengambil HANYA 1 servis TERBARU.
      */
-    public function latestService(): HasOne // 👈 TAMBAHKAN FUNGSI INI
+    public function latestService(): HasOne
     {
         return $this->hasOne(ServiceHistory::class)->latestOfMany('service_date');
     }
