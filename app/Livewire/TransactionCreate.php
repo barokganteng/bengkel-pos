@@ -47,6 +47,7 @@ class TransactionCreate extends Component
     // Bagian Keranjang
     public $cart = [];
     public $total = 0;
+    public $notes = '';
 
     /**
      * Dijalankan saat komponen dimuat pertama kali
@@ -76,7 +77,7 @@ class TransactionCreate extends Component
         // Validasi data pelanggan baru
         $validated = $this->validate([
             'new_name' => 'required|string|min:3',
-            'new_email' => 'required|email|unique:users,email',
+            'new_email' => 'email|unique:users,email',
             'new_phone' => 'nullable|string',
             'new_password' => 'required|min:6',
         ]);
@@ -341,6 +342,7 @@ class TransactionCreate extends Component
                 'total_price' => $this->total,
                 'status' => 'pending', // Atau 'done' jika Anda mau, kita set 'pending' untuk status "dikerjakan"
                 'service_date' => now(),
+                'notes' => $this->notes,
             ]);
 
             // 4. Loop Keranjang dan Simpan Detail + Kurangi Stok

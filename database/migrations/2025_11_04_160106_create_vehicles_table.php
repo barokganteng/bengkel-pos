@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('brand'); // Merk (e.g., Honda)
             $table->string('model'); // Model (e.g., Vario 150)
             $table->string('year')->nullable();
+            $table->date('last_reminder_sent_at')->nullable();
             $table->timestamps();
         });
     }

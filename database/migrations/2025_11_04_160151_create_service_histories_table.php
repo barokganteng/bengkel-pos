@@ -26,6 +26,7 @@ return new class extends Migration
             $table->unsignedBigInteger('total_price')->default(0);
             $table->enum('status', ['pending', 'in_progress', 'done', 'paid'])->default('pending');
             $table->timestamp('service_date')->useCurrent();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

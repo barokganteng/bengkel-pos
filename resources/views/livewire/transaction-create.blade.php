@@ -165,6 +165,12 @@
                         </select>
                     </div>
 
+                    <div class="form-group">
+                        <label for="notes">Catatan (Opsional)</label>
+                        <textarea wire:model="notes" class="form-control" id="notes" rows="2"
+                            placeholder="Cth: Garansi 1 minggu, Oli bawa sendiri..."></textarea>
+                    </div>
+
                     <button class="btn btn-success btn-block mt-3" wire:click="saveTransaction()">
                         Simpan Transaksi
                     </button>

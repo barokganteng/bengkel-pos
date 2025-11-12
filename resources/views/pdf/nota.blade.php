@@ -124,6 +124,13 @@
             </tfoot>
         </table>
 
+        @if ($tx->notes)
+            <div style="margin-bottom: 20px; border: 1px dashed #ccc; padding: 10px;">
+                <strong>Catatan:</strong><br>
+                {{ $tx->notes }}
+            </div>
+        @endif
+
         <p style="text-align: center;">Terima kasih telah servis di bengkel kami!</p>
     </div>
 </body>
