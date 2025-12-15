@@ -24,36 +24,36 @@ class DatabaseSeeder extends Seeder
     {
         $this->command->info('Memulai proses seeding...');
 
-        // 1. Truncate semua tabel (PostgreSQL - non-superuser version)
-        $this->command->info('Menghapus semua data lama (truncate)...');
+        // // 1. Truncate semua tabel (PostgreSQL - non-superuser version)
+        // $this->command->info('Menghapus semua data lama (truncate)...');
 
-        $tables = [
-            'service_details', 'service_histories', 'bookings', 'vehicles', 'users',
-            'galleries', 'services', 'spareparts', 'jobs', 'failed_jobs', 'job_batches',
-            'password_reset_tokens'
-        ];
+        // $tables = [
+        //     'service_details', 'service_histories', 'bookings', 'vehicles', 'users',
+        //     'galleries', 'services', 'spareparts', 'jobs', 'failed_jobs', 'job_batches',
+        //     'password_reset_tokens'
+        // ];
 
-        // Bungkus nama tabel dengan kutip ganda untuk PostgreSQL
-        $quotedTables = collect($tables)->map(fn($t) => '"'.$t.'"');
+        // // Bungkus nama tabel dengan kutip ganda untuk PostgreSQL
+        // $quotedTables = collect($tables)->map(fn($t) => '"'.$t.'"');
 
-        // Nonaktifkan trigger untuk setiap tabel
-        // Ini membutuhkan hak milik (ownership) atas tabel, bukan superuser
-        $this->command->info('Menonaktifkan trigger...');
-        foreach ($tables as $table) {
-             DB::statement("ALTER TABLE \"{$table}\" DISABLE TRIGGER ALL;");
-        }
+        // // Nonaktifkan trigger untuk setiap tabel
+        // // Ini membutuhkan hak milik (ownership) atas tabel, bukan superuser
+        // $this->command->info('Menonaktifkan trigger...');
+        // foreach ($tables as $table) {
+        //      DB::statement("ALTER TABLE \"{$table}\" DISABLE TRIGGER ALL;");
+        // }
 
-        // Truncate semua tabel sekaligus
-        $this->command->info('Melakukan truncate...');
-        DB::statement('TRUNCATE TABLE ' . $quotedTables->implode(', ') . ' RESTART IDENTITY CASCADE;');
+        // // Truncate semua tabel sekaligus
+        // $this->command->info('Melakukan truncate...');
+        // DB::statement('TRUNCATE TABLE ' . $quotedTables->implode(', ') . ' RESTART IDENTITY CASCADE;');
 
-        // Aktifkan kembali trigger
-        $this->command->info('Mengaktifkan kembali trigger...');
-        foreach ($tables as $table) {
-            DB::statement("ALTER TABLE \"{$table}\" ENABLE TRIGGER ALL;");
-        }
+        // // Aktifkan kembali trigger
+        // $this->command->info('Mengaktifkan kembali trigger...');
+        // foreach ($tables as $table) {
+        //     DB::statement("ALTER TABLE \"{$table}\" ENABLE TRIGGER ALL;");
+        // }
 
-        $this->command->info('Tabel berhasil di-truncate.');
+        // $this->command->info('Tabel berhasil di-truncate.');
 
         // 2. Buat Admin Utama
         $this->command->info('Membuat Admin...');
