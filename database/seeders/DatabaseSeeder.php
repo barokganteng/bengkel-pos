@@ -24,17 +24,36 @@ class DatabaseSeeder extends Seeder
     {
         $this->command->info('Memulai proses seeding...');
 
-        // 1. Truncate semua tabel (PostgreSQL version)
-        $this->command->info('Menonaktifkan trigger dan menghapus data lama (truncate)...');
+        // 1. Truncate semua tabel (PostgreSQL - non-superuser version)
+        $this->command->info('Menghapus semua data lama (truncate)...');
 
         $tables = [
-            'users', 'vehicles', 'services', 'spareparts', 'service_histories',
-            'service_details', 'bookings', 'galleries', 'jobs', 'failed_jobs'
+            'service_details', 'service_histories', 'bookings', 'vehicles', 'users',
+            'galleries', 'services', 'spareparts', 'jobs', 'failed_jobs', 'job_batches',
+            'password_reset_tokens'
         ];
 
-        DB::statement('SET session_replication_role = replica;');
-        DB::statement('TRUNCATE TABLE ' . implode(', ', $tables) . ' RESTART IDENTITY CASCADE;');
-        DB::statement('SET session_replication_role = origin;');
+        // Bungkus nama tabel dengan kutip ganda untuk PostgreSQL
+        $quotedTables = collect($tables)->map(fn($t) => '"'.$t.'"');
+
+        // Nonaktifkan trigger untuk setiap tabel
+        // Ini membutuhkan hak milik (ownership) atas tabel, bukan superuser
+        $this->command->info('Menonaktifkan trigger...');
+        foreach ($tables as $table) {
+             DB::statement("ALTER TABLE \"{$table}\" DISABLE TRIGGER ALL;");
+        }
+
+        // Truncate semua tabel sekaligus
+        $this->command->info('Melakukan truncate...');
+        DB::statement('TRUNCATE TABLE ' . $quotedTables->implode(', ') . ' RESTART IDENTITY CASCADE;');
+
+        // Aktifkan kembali trigger
+        $this->command->info('Mengaktifkan kembali trigger...');
+        foreach ($tables as $table) {
+            DB::statement("ALTER TABLE \"{$table}\" ENABLE TRIGGER ALL;");
+        }
+
+        $this->command->info('Tabel berhasil di-truncate.');
 
         // 2. Buat Admin Utama
         $this->command->info('Membuat Admin...');
