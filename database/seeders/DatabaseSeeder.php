@@ -24,20 +24,17 @@ class DatabaseSeeder extends Seeder
     {
         $this->command->info('Memulai proses seeding...');
 
-        // 1. Matikan foreign key & Truncate semua tabel
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        User::truncate();
-        Vehicle::truncate();
-        Service::truncate();
-        Sparepart::truncate();
-        ServiceHistory::truncate();
-        ServiceDetail::truncate();
-        Booking::truncate();
-        Gallery::truncate();
-        // (Tambahkan tabel jobs dan failed_jobs jika perlu)
-        // DB::table('jobs')->truncate();
-        // DB::table('failed_jobs')->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        // 1. Truncate semua tabel (PostgreSQL version)
+        $this->command->info('Menonaktifkan trigger dan menghapus data lama (truncate)...');
+
+        $tables = [
+            'users', 'vehicles', 'services', 'spareparts', 'service_histories',
+            'service_details', 'bookings', 'galleries', 'jobs', 'failed_jobs'
+        ];
+
+        DB::statement('SET session_replication_role = replica;');
+        DB::statement('TRUNCATE TABLE ' . implode(', ', $tables) . ' RESTART IDENTITY CASCADE;');
+        DB::statement('SET session_replication_role = origin;');
 
         // 2. Buat Admin Utama
         $this->command->info('Membuat Admin...');

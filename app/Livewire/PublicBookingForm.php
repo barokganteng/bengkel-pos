@@ -25,7 +25,7 @@ class PublicBookingForm extends Component
     // Aturan validasi
     protected $rules = [
         'name' => 'required|string|min:3',
-        'email' => 'required|email',
+        'email' => 'email',
         'phone' => 'required|string',
         'license_plate' => 'required|string',
         'brand' => 'required|string', // Merk
