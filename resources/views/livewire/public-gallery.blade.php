@@ -12,8 +12,8 @@
         @forelse ($galleries as $gallery)
             <div class="col-md-4 col-sm-6 mb-4">
                 <div class="card h-100 shadow-sm border-0">
-                    <a href="{{ asset('storage/' . $gallery->image_path) }}" data-toggle="lightbox">
-                        <img src="{{ asset('storage/' . $gallery->image_path) }}" class="card-img-top"
+                    <a href="{{ Storage::disk('s3')->get($gallery->image_path) }}" data-toggle="lightbox">
+                        <img src="{{ Storage::disk('s3')->get($gallery->image_path) }}" class="card-img-top"
                             style="height: 250px; object-fit: cover;" alt="{{ $gallery->caption }}">
                     </a>
                     @if ($gallery->caption)

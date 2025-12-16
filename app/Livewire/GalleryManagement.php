@@ -38,10 +38,7 @@ class GalleryManagement extends Component
     public function store()
     {
         $this->validate();
-
-        // Simpan gambar ke 'public/gallery'
-        // 'storage:link' akan membuatnya bisa diakses via 'storage/gallery'
-        $path = $this->image->store('gallery', 'public');
+        $path = Storage::disk('s3')->putFile('\gallery', $this->image);
 
         // Simpan path ke database
         Gallery::create([
