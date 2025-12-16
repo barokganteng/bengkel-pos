@@ -59,7 +59,7 @@
                     @foreach ($galleries as $gallery)
                         <div class="col-md-4 col-sm-6 mb-4">
                             <div class="card h-100">
-                                <img src="{{ asset('storage/' . $gallery->image_path) }}" class="card-img-top"
+                                <img src="{{ Storage::url($gallery->image_path) }}" class="card-img-top"
                                     style="height: 200px; object-fit: cover;" alt="{{ $gallery->caption }}">
                                 <div class="card-body">
                                     <p class="card-text">{{ $gallery->caption ?? 'Tanpa caption' }}</p>

@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Gallery; // 👈 Gunakan Model Gallery
+use Illuminate\Support\Facades\Request;
 use Livewire\WithFileUploads; // 👈 1. IMPORT Trait File Uploads
 use Illuminate\Support\Facades\Storage; // 👈 2. IMPORT Storage Facade
 use Livewire\Attributes\Layout;
@@ -35,10 +36,10 @@ class GalleryManagement extends Component
     /**
      * Menyimpan gambar baru
      */
-    public function store()
+    public function store(Request $request)
     {
         $this->validate();
-        $path = $this->image->store('gallery');
+        $path = Storage::putFile('gallery', $request->file('image'));
 
         // Simpan path ke database
         Gallery::create([
@@ -58,7 +59,7 @@ class GalleryManagement extends Component
         $gallery = Gallery::find($id);
         if ($gallery) {
             // 1. Hapus file dari storage
-            Storage::disk('public')->delete($gallery->image_path);
+            Storage::delete($gallery->image_path);
 
             // 2. Hapus record dari database
             $gallery->delete();
