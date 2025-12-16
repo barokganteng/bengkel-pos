@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Gallery; // 👈 Gunakan Model Gallery
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use Livewire\WithFileUploads; // 👈 1. IMPORT Trait File Uploads
 use Illuminate\Support\Facades\Storage; // 👈 2. IMPORT Storage Facade
 use Livewire\Attributes\Layout;
