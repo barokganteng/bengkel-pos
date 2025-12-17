@@ -40,7 +40,7 @@ class GalleryManagement extends Component
     {
         $this->validate();
         // $path = Storage::putFile('gallery', $request->file('image'));
-        $path = $this->image->store('galleries', 'bengkel_pos');
+        $path = $this->image->store('galleries');
 
         // Simpan path ke database
         Gallery::create([
