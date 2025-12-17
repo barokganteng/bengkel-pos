@@ -39,7 +39,8 @@ class GalleryManagement extends Component
     public function store(Request $request)
     {
         $this->validate();
-        $path = Storage::putFile('gallery', $request->file('image'));
+        // $path = Storage::putFile('gallery', $request->file('image'));
+        $path = $request->file('photo')->store('photos', 'bengkel_pos');
 
         // Simpan path ke database
         Gallery::create([
