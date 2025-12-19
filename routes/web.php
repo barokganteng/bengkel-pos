@@ -11,7 +11,6 @@ use App\Livewire\GalleryManagement;
 use App\Livewire\PublicHomepage;
 use App\Livewire\PublicGallery;
 use App\Livewire\PublicBookingForm;
-use App\Models\Vehicle;
 use Illuminate\Support\Facades\Auth;
 
 

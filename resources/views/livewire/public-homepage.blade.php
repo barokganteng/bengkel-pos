@@ -67,7 +67,7 @@
                         <div class="row">
                             @foreach ($latestGalleries as $gallery)
                                 <div class="col-6 mb-3">
-                                    <img src="{{ asset('storage/' . $gallery->image_path) }}"
+                                    <img src="{{ Storage::url($gallery->image_path) }}"
                                         class="img-fluid rounded shadow-sm"
                                         style="height: 150px; width: 100%; object-fit: cover;"
                                         alt="{{ $gallery->caption ?? 'Galeri Bengkel' }}">
