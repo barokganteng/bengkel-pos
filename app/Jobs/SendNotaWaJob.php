@@ -57,11 +57,11 @@ class SendNotaWaJob implements ShouldQueue
             // 3. Simpan PDF ke folder 'storage/app/public/notas'
             // Pastikan Anda sudah menjalankan "php artisan storage:link"
             $filename = 'notas/nota-' . $tx->id . '-' . time() . '.pdf';
-            Storage::disk('public')->put($filename, $pdf->output());
+            Storage::put($filename, $pdf->output());
 
             // 4. Dapatkan URL publik ke file PDF tersebut
             // Penting: APP_URL di .env harus benar!
-            $publicUrl = config('app.url') . Storage::url($filename);
+            $file = Storage::get($filename);
 
             // 5. Siapkan pesan (caption) untuk WA
             $caption = "Terima kasih, " . $tx->customer->name . "!\n\n" .
@@ -70,10 +70,11 @@ class SendNotaWaJob implements ShouldQueue
                 "Terima kasih atas kepercayaan Anda.";
 
             // 6. Kirim WA menggunakan WaService
-            $waService->sendMessage(
-                $tx->customer->phone, // Nomor HP pelanggan
-                $caption,              // Pesan
-                $publicUrl,           // URL ke PDF
+            $waService->sendFile(
+                $tx->customer->phone,
+                $caption,
+                $file,
+                'nota-' . $tx->id . '.pdf'
             );
 
             // 7. (Opsional) Catat jika berhasil

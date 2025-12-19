@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5dab6b2b5206600e358cc296763caae2",
+    "content-hash": "8217e3fca2fe8aa614d6cb5dd4764f01",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -1434,72 +1434,6 @@
                 }
             ],
             "time": "2025-08-22T14:27:06+00:00"
-        },
-        {
-            "name": "kirimi/kirimi-php",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kiriminow/kirimi-php.git",
-                "reference": "779075a6bbb4b3e43a1a29291ddd7158db1dd2eb"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kiriminow/kirimi-php/zipball/779075a6bbb4b3e43a1a29291ddd7158db1dd2eb",
-                "reference": "779075a6bbb4b3e43a1a29291ddd7158db1dd2eb",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "guzzlehttp/guzzle": "^7.0",
-                "php": ">=7.4"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^9.5 || ^10.0",
-                "squizlabs/php_codesniffer": "^3.6",
-                "symfony/var-dumper": "^5.0 || ^6.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Kirimi\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ari Padrian",
-                    "email": "yolkmonday@gmail.com",
-                    "homepage": "https://github.com/yolkmonday",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Official PHP client library for the Kirimi WhatsApp API. Send messages, handle OTP verification, and manage WhatsApp communication with ease.",
-            "homepage": "https://github.com/yolkmonday/kirimi-php",
-            "keywords": [
-                "API-Client",
-                "automation",
-                "communication",
-                "kirimi",
-                "messaging",
-                "notification",
-                "otp",
-                "otp-verification",
-                "php",
-                "sms",
-                "whatsapp",
-                "whatsapp-api",
-                "whatsapp-bot",
-                "whatsapp-client"
-            ],
-            "support": {
-                "issues": "https://github.com/kiriminow/kirimi-php/issues",
-                "source": "https://github.com/kiriminow/kirimi-php/tree/v1.0.0"
-            },
-            "time": "2025-07-09T06:52:30+00:00"
         },
         {
             "name": "laravel/framework",
