@@ -1,7 +1,3 @@
-Tentu, ini adalah draf `README.md` yang merangkum semua yang telah kita bangun. Ini dirancang agar jelas dan profesional untuk repositori Git Anda.
-
----
-
 # Bengkel POS - Sistem Point of Sale Bengkel
 
 **Bengkel POS** adalah aplikasi web modern yang dirancang untuk mengelola operasi harian bengkel (motor/mobil). Aplikasi ini dibangun sebagai proyek monolitik menggunakan _stack_ TALL (versi Blade/Bootstrap), yang membuatnya cepat, reaktif, dan mudah dikelola.
@@ -169,7 +165,7 @@ Untuk menjalankan proyek ini, Anda perlu menjalankan **3 proses** di terminal te
 1.  **Terminal 1: Server Web**
 
     ```bash
-    php artisan serve
+    composer run dev
     ```
 
 2.  **Terminal 2: Queue Worker (Pekerja Antrian)**
