@@ -68,13 +68,15 @@ class SparepartManagement extends Component
     public function store()
     {
         $this->validate(); // Validasi data
+        var_dump($this->sparepart_id);
 
-        Sparepart::updateOrCreate(['id' => $this->sparepart_id], [
+        $respone = Sparepart::updateOrCreate(['id' => is_int($this->sparepart_id) ? $this->sparepart_id : null], [
             'name' => $this->name,
             'sku' => $this->sku,
             'stock' => $this->stock,
             'sale_price' => $this->sale_price,
         ]);
+        var_dump($respone);
 
         session()->flash(
             'message',

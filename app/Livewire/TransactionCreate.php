@@ -7,12 +7,14 @@ use App\Models\User; // Model User (untuk Pelanggan & Mekanik)
 use App\Models\Vehicle; // Model Kendaraan
 use App\Models\Service; // Model Jasa Servis
 use App\Models\Sparepart; // Model Sparepart
+use App\Models\Booking; // Model Booking
 use App\Models\ServiceHistory;
 use App\Models\ServiceDetail;
 use App\Jobs\SendNotaWaJob;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\Hash;
+
 
 
 class TransactionCreate extends Component
@@ -56,6 +58,46 @@ class TransactionCreate extends Component
     {
         // Langsung muat daftar mekanik
         $this->mechanics = User::mechanic()->get();
+        // Cek apakah ada parameter 'booking_id' dari URL
+        if (request()->has('booking_id')) {
+            $this->loadBookingData(request('booking_id'));
+        }
+    }
+
+    public function loadBookingData($bookingId)
+    {
+        $booking = Booking::find($bookingId);
+
+        if ($booking) {
+            // 1. Isi Data Pelanggan (sesuaikan nama variabel property Anda, misal $customer_id atau $selectedUser)
+            $this->selected_customer_id = $booking->user_id;
+
+            // Trigger update jika ada logic livewire (updatedCustomerId)
+            // $this->updatedCustomerId();
+
+            // 2. Isi Data Kendaraan
+            $this->selected_vehicle_id = $booking->vehicle_id;
+
+            // 3. Masukkan Service yang dibooking ke Keranjang (Cart)
+            // Asumsi booking punya kolom 'service_id'
+            if ($booking->service_id) {
+                $service = Service::find($booking->service_id);
+                if ($service) {
+                    // Sesuaikan struktur array cart ini dengan sistem keranjang Anda
+                    $this->cart[] = [
+                        'id' => $service->id,
+                        'name' => $service->service_name, // atau $service->name
+                        'price' => $service->price,
+                        'qty' => 1,
+                        'subtotal' => $service->price,
+                        'type' => 'service' // penanda bahwa ini jasa
+                    ];
+
+                    // Jangan lupa hitung ulang total harga transaksi
+                    $this->calculateTotal();
+                }
+            }
+        }
     }
 
     /**
@@ -77,7 +119,7 @@ class TransactionCreate extends Component
         // Validasi data pelanggan baru
         $validated = $this->validate([
             'new_name' => 'required|string|min:3',
-            'new_email' => 'email|unique:users,email',
+            'new_email' => 'nullable|email|unique:users,email',
             'new_phone' => 'nullable|string',
             'new_password' => 'required|min:6',
         ]);
@@ -375,6 +417,16 @@ class TransactionCreate extends Component
 
             // 6. Kirim job ke antiran
             SendNotaWaJob::dispatch($serviceHistory->id);
+
+            // Cek jika transaksi ini berasal dari booking
+            if (request()->has('booking_id')) {
+                $booking = Booking::find(request('booking_id'));
+                if ($booking) {
+                    $booking->update([
+                        'status' => 'completed' // atau 'processed'
+                    ]);
+                }
+            }
 
             // 7. Reset state komponen dan kirim pesan sukses
             session()->flash('message', 'Transaksi berhasil disimpan.');
