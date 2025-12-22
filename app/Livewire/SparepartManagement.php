@@ -6,29 +6,27 @@ use Livewire\Component;
 use App\Models\Sparepart;
 use Livewire\Attributes\Layout;
 use Livewire\WithPagination;
+use Livewire\Attributes\Validate;
 
 class SparepartManagement extends Component
 {
     use WithPagination;
 
     // Properti untuk data binding form
-    public $name, $sku, $stock, $sale_price;
+    #[Validate('required|min:3')]
+    public $name;
+    #[Validate('nullable|unique:spareparts,sku')]
+    public $sku;
+    #[Validate('required|integer|min:0')]
+    public $stock;
+    #[Validate('required|numeric|min:0')]
+    public $sale_price;
+    // Properti untuk menyimpan ID saat edit
     public $sparepart_id; // Untuk menyimpan ID saat edit
     public $search = '';
 
     // Properti untuk modal
     public $isModalOpen = false;
-
-    // Aturan validasi
-    protected function rules()
-    {
-        return [
-            'name' => 'required|string|min:3',
-            'sku' => 'nullable|string|unique:spareparts,sku,' . $this->sparepart_id,
-            'stock' => 'required|integer|min:0',
-            'sale_price' => 'required|numeric|min:0',
-        ];
-    }
 
     // Jangan lupa tambahkan layout admin
     #[Layout('layouts.admin')]
@@ -68,15 +66,15 @@ class SparepartManagement extends Component
     public function store()
     {
         $this->validate(); // Validasi data
-        var_dump($this->sparepart_id);
 
-        $respone = Sparepart::updateOrCreate(['id' => is_int($this->sparepart_id) ? $this->sparepart_id : null], [
+        $respone = Sparepart::updateOrCreate([
+            'id' => $this->sparepart_id,
+        ], [
             'name' => $this->name,
             'sku' => $this->sku,
             'stock' => $this->stock,
             'sale_price' => $this->sale_price,
         ]);
-        var_dump($respone);
 
         session()->flash(
             'message',
