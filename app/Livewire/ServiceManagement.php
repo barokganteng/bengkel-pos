@@ -23,7 +23,7 @@ class ServiceManagement extends Component
     protected function rules()
     {
         return [
-            'name' => 'required|string|min:3|unique:services,name,' . $this->service_id,
+            'name' => 'required|string|min:3|unique:services,name',
             'price' => 'required|numeric|min:0',
         ];
     }
@@ -61,6 +61,7 @@ class ServiceManagement extends Component
     // Menyimpan data (Create atau Update)
     public function store()
     {
+        // TODO: Perbaiki bagian ini
         $this->validate(); // Validasi data
 
         Service::updateOrCreate(['id' => $this->service_id], [

@@ -73,23 +73,12 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button"
-                                            data-toggle="dropdown">
-                                            Ubah Status
-                                        </button>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#"
-                                                wire:click.prevent="updateBookingStatus({{ $booking->id }}, 'confirmed')">Konfirmasi</a>
-                                            <a class="dropdown-item" href="#"
-                                                wire:click.prevent="updateBookingStatus({{ $booking->id }}, 'completed')">Selesaikan</a>
-                                            <a class="dropdown-item" href="#"
-                                                wire:click.prevent="updateBookingStatus({{ $booking->id }}, 'cancelled')">Batalkan</a>
-                                            <a class="dropdown-item" href="#"
-                                                wire:click.prevent="updateBookingStatus({{ $booking->id }}, 'pending')">Set
-                                                Pending</a>
-                                        </div>
-                                    </div>
+                                    @if ($booking->status == 'pending' || $booking->status == 'confirmed')
+                                        <a href="{{ route('transaction.create', ['booking_id' => $booking->id]) }}"
+                                            class="btn btn-success btn-sm">
+                                            <i class="fas fa-cash-register"></i> Proses
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
