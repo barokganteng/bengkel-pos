@@ -121,6 +121,7 @@ class TransactionList extends Component
 
             $transaction->status = $status;
             $transaction->save();
+            
             session()->flash('message', 'Status transaksi #' . $id . ' berhasil diubah menjadi ' . $this->statusLabel($status));
         }
     }
