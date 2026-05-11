@@ -2,10 +2,13 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\ServiceHistory;
 use App\Models\ServiceDetail;
+use App\Models\ServiceHistory;
+use App\Services\WaService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
+use Livewire\Component;
 use Livewire\WithPagination;
 
 class TransactionList extends Component
@@ -28,12 +31,16 @@ class TransactionList extends Component
 
     // Properti untuk filter
     public $search = '';
+
     public $filterStatus = '';
+
     public $filterDate = '';
 
     // Properti untuk modal detail
     public $isModalOpen = false;
+
     public $selectedTransaction = null;
+
     public $details = [];
 
     #[Layout(
@@ -46,21 +53,21 @@ class TransactionList extends Component
             ->with(['customer', 'vehicle', 'mechanic']);
 
         // Terapkan filter pencarian (Nama Pelanggan atau No. Polisi)
-        if (!empty($this->search)) {
+        if (! empty($this->search)) {
             $query->whereHas('customer', function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%');
+                $q->where('name', 'like', '%'.$this->search.'%');
             })->orWhereHas('vehicle', function ($q) {
-                $q->where('license_plate', 'like', '%' . $this->search . '%');
+                $q->where('license_plate', 'like', '%'.$this->search.'%');
             });
         }
 
         // Terapkan filter status
-        if (!empty($this->filterStatus)) {
+        if (! empty($this->filterStatus)) {
             $query->where('status', $this->filterStatus);
         }
 
         // Terapkan filter tanggal
-        if (!empty($this->filterDate)) {
+        if (! empty($this->filterDate)) {
             $query->whereDate('service_date', $this->filterDate);
         }
 
@@ -95,8 +102,9 @@ class TransactionList extends Component
     {
         // Validasi status
         $allowedStatus = ['pending', 'in_progress', 'done', 'paid'];
-        if (!in_array($status, $allowedStatus)) {
+        if (! in_array($status, $allowedStatus)) {
             session()->flash('error', 'Status tidak valid.'); // Kirim pesan error
+
             return;
         }
 
@@ -121,7 +129,58 @@ class TransactionList extends Component
 
             $transaction->status = $status;
             $transaction->save();
-            session()->flash('message', 'Status transaksi #' . $id . ' berhasil diubah menjadi ' . $this->statusLabel($status));
+
+            // Kirim notifikasi singkat setiap kali status berubah
+            if ($transaction->customer && $transaction->customer->phone && in_array($status, ['in_progress', 'done', 'paid'])) {
+                try {
+                    $wa = new WaService;
+                    $shortMessage = "Halo {$transaction->customer->name}, status transaksi untuk kendaraan {$transaction->vehicle->license_plate} berubah menjadi ".$this->statusLabel($status).'.';
+                    $wa->sendMessage($transaction->customer->phone, $shortMessage);
+                } catch (\Throwable $e) {
+                    // Jangan blokir alur jika pengiriman notifikasi gagal
+                }
+            }
+
+            if ($status === 'paid') {
+
+                // Kirim notifikasi invocice lengkap saat transaksi selesai
+                if ($transaction->customer && $transaction->customer->phone) {
+                    try {
+                        $wa = new WaService;
+                        $details = ServiceDetail::with('itemable')
+                            ->where('service_history_id', $tx->id)
+                            ->get();
+
+                        // 2. Generate PDF dari view blade yang kita buat
+                        $pdf = Pdf::loadView('pdf.nota', [
+                            'tx' => $tx,
+                            'details' => $details,
+                        ]);
+
+                        // 3. Simpan PDF ke folder 'storage/app/public/notas'
+                        // Pastikan Anda sudah menjalankan "php artisan storage:link"
+                        $filename = 'notas/nota-'.$tx->id.'-'.time().'.pdf';
+                        Storage::disk('public')->put($filename, $pdf->output());
+
+                        // 4. Dapatkan URL publik ke file PDF tersebut
+                        // Penting: APP_URL di .env harus benar!
+                        $fileUrl = Storage::disk('public')->url($filename);
+
+                        // 5. Siapkan pesan (caption) untuk WA
+                        $message = 'Terima kasih, '.$tx->customer->name."!\n\n".
+                            'Servis untuk kendaraan '.$tx->vehicle->license_plate." telah selesai. Berikut kami lampirkan nota digital Anda.\n\n".
+                            'Total Tagihan: Rp '.number_format($tx->total_price)."\n\n".
+                            'Terima kasih atas kepercayaan Anda.'."\n\n".
+                            $fileUrl;
+                        $wa->sendMessage($transaction->customer->phone, $message);
+                    } catch (\Throwable $e) {
+                        // Jangan blokir alur jika inisialisasi WA gagal
+                        return;
+                    }
+                }
+            }
+
+            session()->flash('message', 'Status transaksi #'.$id.' berhasil diubah menjadi '.$this->statusLabel($status));
         }
     }
 
