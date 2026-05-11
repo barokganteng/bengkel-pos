@@ -12,6 +12,20 @@ class TransactionList extends Component
 {
     use WithPagination;
 
+    private const STATUS_LABELS = [
+        'pending' => 'Antrean',
+        'in_progress' => 'Pengerjaan',
+        'done' => 'Transaksi',
+        'paid' => 'Pembayaran',
+    ];
+
+    private const STATUS_CLASSES = [
+        'pending' => 'bg-warning text-dark',
+        'in_progress' => 'bg-info text-white',
+        'done' => 'bg-success text-white',
+        'paid' => 'bg-primary text-white',
+    ];
+
     // Properti untuk filter
     public $search = '';
     public $filterStatus = '';
@@ -92,6 +106,21 @@ class TransactionList extends Component
             $transaction->save();
             session()->flash('message', 'Status transaksi #' . $id . ' berhasil diubah menjadi ' . $status);
         }
+    }
+
+    public function statusLabel(string $status): string
+    {
+        return self::STATUS_LABELS[$status] ?? ucfirst($status);
+    }
+
+    public function statusBadgeClass(string $status): string
+    {
+        return self::STATUS_CLASSES[$status] ?? 'bg-secondary text-white';
+    }
+
+    public function isQueueDraft($transaction): bool
+    {
+        return $transaction->status === 'pending' && (int) $transaction->total_price === 0;
     }
 
     /**

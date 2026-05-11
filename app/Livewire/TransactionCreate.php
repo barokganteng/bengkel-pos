@@ -17,6 +17,12 @@ use Livewire\Component;
 
 class TransactionCreate extends Component
 {
+    // State tahap UI: true jika customer/kendaraan sudah dimasukkan ke antrean
+    public $is_queue_stage_done = false;
+
+    // Menyimpan ID draft antrean yang sudah tersimpan di database
+    public $queued_service_history_id = null;
+
     // Properti Modal Pelanggan Baru
     public $isNewCustomerModalOpen = false;
 
@@ -76,10 +82,41 @@ class TransactionCreate extends Component
     {
         // Langsung muat daftar mekanik
         $this->mechanics = User::mechanic()->get();
+
+        if (request()->has('queue_id')) {
+            $this->loadQueuedServiceHistory(request('queue_id'));
+
+            return;
+        }
+
         // Cek apakah ada parameter 'booking_id' dari URL
         if (request()->has('booking_id')) {
             $this->loadBookingData(request('booking_id'));
         }
+    }
+
+    public function loadQueuedServiceHistory($queueId)
+    {
+        $queue = ServiceHistory::with(['customer', 'vehicle'])
+            ->where('id', $queueId)
+            ->where('status', 'pending')
+            ->first();
+
+        if (! $queue) {
+            session()->flash('error', 'Data antrean tidak ditemukan atau sudah diproses.');
+
+            return;
+        }
+
+        $this->queued_service_history_id = $queue->id;
+        $this->selected_customer_id = $queue->customer_id;
+        $this->selected_customer_name = $queue->customer?->name;
+        $this->selected_vehicle_id = $queue->vehicle_id;
+        $this->notes = $queue->notes;
+        $this->is_queue_stage_done = true;
+
+        $customer = User::find($queue->customer_id);
+        $this->vehicles = $customer ? $customer->vehicles : [];
     }
 
     public function loadBookingData($bookingId)
@@ -100,7 +137,69 @@ class TransactionCreate extends Component
             $this->vehicles = $vehicles;
             $this->selected_vehicle_id = $booking->vehicle_id;
 
+            // Booking yang dimuat tetap harus dikonfirmasi antreannya dari UI
+            $this->is_queue_stage_done = false;
+            $this->queued_service_history_id = null;
+
         }
+    }
+
+    public function enterQueue()
+    {
+        if (! $this->selected_customer_id || ! $this->selected_vehicle_id) {
+            session()->flash('error', 'Pilih pelanggan dan kendaraan terlebih dahulu untuk masuk antrean.');
+
+            return;
+        }
+
+        if ($this->queued_service_history_id) {
+            $existingQueue = ServiceHistory::find($this->queued_service_history_id);
+            if ($existingQueue) {
+                $this->is_queue_stage_done = true;
+                session()->flash('message', 'Data antrean sudah tersimpan sebelumnya.');
+
+                return;
+            }
+        }
+
+        $queue = ServiceHistory::create([
+            'customer_id' => $this->selected_customer_id,
+            'vehicle_id' => $this->selected_vehicle_id,
+            'mechanic_id' => null,
+            'total_price' => 0,
+            'status' => 'pending',
+            'service_date' => now(),
+            'notes' => $this->notes,
+        ]);
+
+        $this->queued_service_history_id = $queue->id;
+        $this->is_queue_stage_done = true;
+        session()->flash('message', 'Data customer sudah dimasukkan ke antrean dan tersimpan di database.');
+    }
+
+    public function resetQueueStage()
+    {
+        $this->discardQueuedDraft();
+        $this->is_queue_stage_done = false;
+        $this->item_search = '';
+        $this->item_results = [];
+        $this->cart = [];
+        $this->total = 0;
+        $this->selected_mechanic_id = null;
+    }
+
+    private function discardQueuedDraft(): void
+    {
+        if (! $this->queued_service_history_id) {
+            return;
+        }
+
+        $draft = ServiceHistory::withCount('details')->find($this->queued_service_history_id);
+        if ($draft && $draft->status === 'pending' && (int) $draft->total_price === 0 && $draft->details_count === 0) {
+            $draft->delete();
+        }
+
+        $this->queued_service_history_id = null;
     }
 
     /**
@@ -223,6 +322,7 @@ class TransactionCreate extends Component
         $customer = User::findOrFail($id);
         $this->selected_customer_id = $customer->id;
         $this->selected_customer_name = $customer->name;
+        $this->resetQueueStage();
 
         // Muat kendaraan milik pelanggan
         $this->vehicles = $customer->vehicles;
@@ -237,10 +337,19 @@ class TransactionCreate extends Component
      */
     public function resetCustomer()
     {
+        $this->resetQueueStage();
         $this->selected_customer_id = null;
         $this->selected_customer_name = null;
         $this->selected_vehicle_id = null;
         $this->vehicles = [];
+    }
+
+    public function updatedSelectedVehicleId($value)
+    {
+        // Jika kendaraan diganti setelah antrean aktif, paksa antrean dikonfirmasi ulang.
+        if (! empty($value)) {
+            $this->resetQueueStage();
+        }
     }
 
     /**
@@ -288,6 +397,12 @@ class TransactionCreate extends Component
      */
     public function addItemToCart($type, $id)
     {
+        if (! $this->is_queue_stage_done) {
+            session()->flash('error', 'Masukkan customer ke antrean terlebih dahulu sebelum menambah item.');
+
+            return;
+        }
+
         // Cek duplikat
         foreach ($this->cart as $key => $item) {
             if ($item['id'] == $id && $item['type'] == $type) {
@@ -376,6 +491,12 @@ class TransactionCreate extends Component
 
     public function saveTransaction()
     {
+        if (! $this->is_queue_stage_done) {
+            session()->flash('error', 'Customer belum masuk antrean. Selesaikan tahap antrean terlebih dahulu.');
+
+            return;
+        }
+
         // 1. Validasi Sederhana
         if (count($this->cart) == 0 || ! $this->selected_customer_id || ! $this->selected_vehicle_id || ! $this->selected_mechanic_id) {
             session()->flash('error', 'Harap lengkapi semua data (Pelanggan, Kendaraan, Mekanik, dan Item).');
@@ -387,16 +508,41 @@ class TransactionCreate extends Component
         DB::beginTransaction();
 
         try {
-            // 3. Buat Catatan ServiceHistory (Transaksi Induk)
-            $serviceHistory = ServiceHistory::create([
-                'customer_id' => $this->selected_customer_id,
-                'vehicle_id' => $this->selected_vehicle_id,
-                'mechanic_id' => $this->selected_mechanic_id,
-                'total_price' => $this->total,
-                'status' => 'pending', // Atau 'done' jika Anda mau, kita set 'pending' untuk status "dikerjakan"
-                'service_date' => now(),
-                'notes' => $this->notes,
-            ]);
+            // 3. Gunakan draft antrean yang sudah ada, fallback create jika ID draft tidak tersedia.
+            if ($this->queued_service_history_id) {
+                $serviceHistory = ServiceHistory::find($this->queued_service_history_id);
+
+                if (! $serviceHistory) {
+                    throw new \Exception('Draft antrean tidak ditemukan. Silakan masukkan antrean ulang.');
+                }
+
+                if ((int) $serviceHistory->customer_id !== (int) $this->selected_customer_id || (int) $serviceHistory->vehicle_id !== (int) $this->selected_vehicle_id) {
+                    throw new \Exception('Data customer/kendaraan berbeda dengan draft antrean yang dipilih.');
+                }
+
+                if ($serviceHistory->details()->exists()) {
+                    throw new \Exception('Draft antrean ini sudah memiliki detail item. Gunakan data antrean lain atau reset antrean.');
+                }
+
+                $serviceHistory->update([
+                    'mechanic_id' => $this->selected_mechanic_id,
+                    'total_price' => $this->total,
+                    'status' => 'done',
+                    'service_date' => now(),
+                    'notes' => $this->notes,
+                ]);
+            } else {
+                $serviceHistory = ServiceHistory::create([
+                    'customer_id' => $this->selected_customer_id,
+                    'vehicle_id' => $this->selected_vehicle_id,
+                    'mechanic_id' => $this->selected_mechanic_id,
+                    'total_price' => $this->total,
+                    'status' => 'done',
+                    'service_date' => now(),
+                    'notes' => $this->notes,
+                ]);
+                $this->queued_service_history_id = $serviceHistory->id;
+            }
 
             // 4. Loop Keranjang dan Simpan Detail + Kurangi Stok
             foreach ($this->cart as $item) {
@@ -454,6 +600,8 @@ class TransactionCreate extends Component
      */
     private function resetAll()
     {
+        $this->is_queue_stage_done = false;
+        $this->queued_service_history_id = null;
         $this->customer_search = '';
         $this->customers = [];
         $this->selected_customer_id = null;

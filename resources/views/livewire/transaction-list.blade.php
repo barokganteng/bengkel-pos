@@ -24,10 +24,10 @@
                     <label>Filter Status</label>
                     <select wire:model.live="filterStatus" class="form-control">
                         <option value="">Semua Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="done">Done</option>
-                        <option value="paid">Paid</option>
+                        <option value="pending">Antrean</option>
+                        <option value="in_progress">Pengerjaan</option>
+                        <option value="done">Transaksi</option>
+                        <option value="paid">Pembayaran</option>
                     </select>
                 </div>
                 <div class="col-md-4">
@@ -65,43 +65,38 @@
                                 <td>{{ $tx->vehicle->license_plate ?? 'N/A' }}</td>
                                 <td>{{ $tx->mechanic->name ?? 'N/A' }}</td>
                                 <td>Rp {{ number_format($tx->total_price, 0, ',', '.') }}</td>
-                                <td><span class="badge bg-info text-white">{{ $tx->status }}</span></td>
+                                <td>
+                                    <span class="badge {{ $this->statusBadgeClass($tx->status) }}">
+                                        {{ $this->statusLabel($tx->status) }}
+                                    </span>
+                                </td>
 
                                 <td>
-                                    @php
-                                        $statusClass = 'btn-secondary'; // Default
-                                        if ($tx->status == 'pending') {
-                                            $statusClass = 'btn-warning text-dark';
-                                        }
-                                        if ($tx->status == 'in_progress') {
-                                            $statusClass = 'btn-info';
-                                        }
-                                        if ($tx->status == 'done') {
-                                            $statusClass = 'btn-success';
-                                        }
-                                        if ($tx->status == 'paid') {
-                                            $statusClass = 'btn-primary';
-                                        }
-                                    @endphp
+                                    @if ($this->isQueueDraft($tx))
+                                        <a href="{{ route('transaksi.create', ['queue_id' => $tx->id]) }}"
+                                            class="btn btn-sm btn-outline-primary mb-1 w-100">
+                                            Lanjutkan Antrean
+                                        </a>
+                                    @endif
 
                                     <div class="dropdown">
-                                        <button class="btn btn-sm dropdown-toggle {{ $statusClass }}" type="button"
+                                        <button class="btn btn-sm dropdown-toggle {{ str_replace('bg-', 'btn-', $this->statusBadgeClass($tx->status)) }}" type="button"
                                             data-toggle="dropdown">
-                                            {{ $tx->status }}
+                                            Ubah Status
                                         </button>
                                         <div class="dropdown-menu">
                                             <a class="dropdown-item" href="#"
                                                 wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'pending')">Set
-                                                Pending</a>
+                                                Antrean</a>
                                             <a class="dropdown-item" href="#"
                                                 wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'in_progress')">Set
-                                                In Progress</a>
+                                                Pengerjaan</a>
                                             <a class="dropdown-item" href="#"
                                                 wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'done')">Set
-                                                Done</a>
+                                                Transaksi</a>
                                             <a class="dropdown-item" href="#"
                                                 wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'paid')">Set
-                                                Paid</a>
+                                                Pembayaran</a>
                                         </div>
                                     </div>
                                 </td>
@@ -143,7 +138,9 @@
                                 <strong>Tanggal:</strong>
                                 {{ \Carbon\Carbon::parse($selectedTransaction->service_date)->format('d M Y H:i') }}<br>
                                 <strong>Status:</strong> <span
-                                    class="badge bg-info text-white">{{ $selectedTransaction->status }}</span>
+                                    class="badge {{ $this->statusBadgeClass($selectedTransaction->status) }}">
+                                    {{ $this->statusLabel($selectedTransaction->status) }}
+                                </span>
                             </div>
                         </div>
                         <div class="row mb-3">

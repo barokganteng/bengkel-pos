@@ -19,7 +19,7 @@
 
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">1. Informasi Pelanggan</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">1. Identitas Customer & Antrean</h6>
                 </div>
                 <div class="card-body">
 
@@ -49,6 +49,22 @@
                                     type="button">Baru +</button>
                             </div>
                         </div>
+
+                        @if ($selected_vehicle_id)
+                            <div class="d-flex align-items-center gap-2">
+                                @if (!$is_queue_stage_done)
+                                    <button wire:click="enterQueue()" type="button" class="btn btn-warning">
+                                        Masukkan Antrean
+                                    </button>
+                                    <small class="text-muted d-block mt-2">Tahap berikutnya (layanan & sparepart) akan aktif setelah antrean dikonfirmasi.</small>
+                                @else
+                                    <span class="badge bg-success">Sudah Masuk Antrean</span>
+                                    <button wire:click="resetQueueStage()" type="button" class="btn btn-outline-secondary btn-sm">
+                                        Ubah Data Antrean
+                                    </button>
+                                @endif
+                            </div>
+                        @endif
                     @else
                         <div class="form-group">
                             <label>Cari Pelanggan (Nama, Email, HP)</label>
@@ -76,30 +92,36 @@
             </div>
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">2. Tambah Item Servis</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">2. Layanan & Sparepart</h6>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
-                        <label>Cari Jasa Servis atau Sparepart</label>
-                        <input type="text" wire:model.live.debounce.300ms="item_search" class="form-control"
-                            placeholder="Ketik nama item atau SKU...">
-                    </div>
+                    @if ($is_queue_stage_done)
+                        <div class="form-group">
+                            <label>Cari Jasa Servis atau Sparepart</label>
+                            <input type="text" wire:model.live.debounce.300ms="item_search" class="form-control"
+                                placeholder="Ketik nama item atau SKU...">
+                        </div>
 
-                    @if (count($item_results) > 0)
-                        <ul class="list-group">
-                            @foreach ($item_results as $item)
-                                <li class="list-group-item list-group-item-action" style="cursor: pointer;"
-                                    wire:click="addItemToCart('{{ $item['type'] }}', {{ $item['id'] }})">
-                                    <strong>{{ $item['name'] }}</strong>
-                                    <span class="float-right">
-                                        Rp {{ number_format($item['price']) }}
-                                        @if ($item['type'] == 'sparepart')
-                                            | Stok: {{ $item['stock'] }}
-                                        @endif
-                                    </span>
-                                </li>
-                            @endforeach
-                        </ul>
+                        @if (count($item_results) > 0)
+                            <ul class="list-group">
+                                @foreach ($item_results as $item)
+                                    <li class="list-group-item list-group-item-action" style="cursor: pointer;"
+                                        wire:click="addItemToCart('{{ $item['type'] }}', {{ $item['id'] }})">
+                                        <strong>{{ $item['name'] }}</strong>
+                                        <span class="float-right">
+                                            Rp {{ number_format($item['price']) }}
+                                            @if ($item['type'] == 'sparepart')
+                                                | Stok: {{ $item['stock'] }}
+                                            @endif
+                                        </span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    @else
+                        <div class="alert alert-info mb-0">
+                            Tahap ini dikunci. Pilih customer dan kendaraan, lalu klik <strong>Masukkan Antrean</strong>.
+                        </div>
                     @endif
                 </div>
             </div>
@@ -112,68 +134,74 @@
                     <h6 class="m-0 font-weight-bold text-primary">3. Rincian Biaya</h6>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Item</th>
-                                    <th>Qty</th>
-                                    <th>Harga</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($cart as $key => $item)
+                    @if ($is_queue_stage_done)
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            {{ $item['name'] }} <br>
-                                            <small>@ Rp {{ number_format($item['price']) }}</small>
-                                        </td>
-                                        <td>
-                                            {{ $item['quantity'] }}
-                                        </td>
-                                        <td>{{ number_format($item['price'] * $item['quantity']) }}</td>
-                                        <td>
-                                            <button wire:click="removeItemFromCart({{ $key }})"
-                                                class="btn btn-sm btn-danger p-0 px-1">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </td>
+                                        <th>Item</th>
+                                        <th>Qty</th>
+                                        <th>Harga</th>
+                                        <th>Aksi</th>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" class="text-center">Keranjang kosong</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    @forelse ($cart as $key => $item)
+                                        <tr>
+                                            <td>
+                                                {{ $item['name'] }} <br>
+                                                <small>@ Rp {{ number_format($item['price']) }}</small>
+                                            </td>
+                                            <td>
+                                                {{ $item['quantity'] }}
+                                            </td>
+                                            <td>{{ number_format($item['price'] * $item['quantity']) }}</td>
+                                            <td>
+                                                <button wire:click="removeItemFromCart({{ $key }})"
+                                                    class="btn btn-sm btn-danger p-0 px-1">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="text-center">Keranjang kosong</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
 
-                    <hr>
+                        <hr>
 
-                    <h5>Total: <span class="float-right">Rp {{ number_format($total) }}</span></h5>
+                        <h5>Total: <span class="float-right">Rp {{ number_format($total) }}</span></h5>
 
-                    <hr>
+                        <hr>
 
-                    <div class="form-group">
-                        <label for="mechanic">Pilih Mekanik</label>
-                        <select wire:model="selected_mechanic_id" class="form-control" id="mechanic">
-                            <option value="">-- Pilih Mekanik --</option>
-                            @foreach ($mechanics as $mechanic)
-                                <option value="{{ $mechanic->id }}">{{ $mechanic->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                        <div class="form-group">
+                            <label for="mechanic">Pilih Mekanik</label>
+                            <select wire:model="selected_mechanic_id" class="form-control" id="mechanic">
+                                <option value="">-- Pilih Mekanik --</option>
+                                @foreach ($mechanics as $mechanic)
+                                    <option value="{{ $mechanic->id }}">{{ $mechanic->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="notes">Catatan (Opsional)</label>
-                        <textarea wire:model="notes" class="form-control" id="notes" rows="2"
-                            placeholder="Cth: Garansi 1 minggu, Oli bawa sendiri..."></textarea>
-                    </div>
+                        <div class="form-group">
+                            <label for="notes">Catatan (Opsional)</label>
+                            <textarea wire:model="notes" class="form-control" id="notes" rows="2"
+                                placeholder="Cth: Garansi 1 minggu, Oli bawa sendiri..."></textarea>
+                        </div>
 
-                    <button class="btn btn-success btn-block mt-3" wire:click="saveTransaction()">
-                        Simpan Transaksi
-                    </button>
+                        <button class="btn btn-success btn-block mt-3" wire:click="saveTransaction()">
+                            Simpan Transaksi
+                        </button>
+                    @else
+                        <div class="alert alert-light border mb-0">
+                            Rincian biaya akan aktif setelah customer masuk antrean.
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
