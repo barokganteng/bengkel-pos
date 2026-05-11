@@ -18,7 +18,7 @@
     </style>
     <div class="hero-section">
         <div class="container">
-            <h1 class="display-3 fw-bold">Selamat Datang di Bengkel Kami</h1>
+            <h1 class="display-3 fw-bold">Selamat Datang di Bengkel Ku</h1>
             <p class="lead fs-4">Solusi servis terbaik untuk kendaraan Anda. Profesional, cepat, dan terpercaya.</p>
             <a href="{{ route('public.booking') }}" class="btn btn-primary btn-lg mt-3">Booking Servis Sekarang</a>
         </div>
