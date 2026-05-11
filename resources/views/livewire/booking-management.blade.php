@@ -74,7 +74,7 @@
                                 </td>
                                 <td>
                                     @if ($booking->status == 'pending' || $booking->status == 'confirmed')
-                                        <a href="{{ route('transaction.create', ['booking_id' => $booking->id]) }}"
+                                        <a href="{{ route('transaksi.create', ['booking_id' => $booking->id]) }}"
                                             class="btn btn-success btn-sm">
                                             <i class="fas fa-cash-register"></i> Proses
                                         </a>

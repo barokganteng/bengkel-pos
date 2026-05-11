@@ -2,53 +2,71 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\User; // Model User (untuk Pelanggan & Mekanik)
-use App\Models\Vehicle; // Model Kendaraan
-use App\Models\Service; // Model Jasa Servis
-use App\Models\Sparepart; // Model Sparepart
-use App\Models\Booking; // Model Booking
-use App\Models\ServiceHistory;
-use App\Models\ServiceDetail;
 use App\Jobs\SendNotaWaJob;
+use App\Models\Booking; // Model User (untuk Pelanggan & Mekanik)
+use App\Models\Service; // Model Kendaraan
+use App\Models\ServiceDetail; // Model Jasa Servis
+use App\Models\ServiceHistory; // Model Sparepart
+use App\Models\Sparepart; // Model Booking
+use App\Models\User;
+use App\Models\Vehicle;
 use Illuminate\Support\Facades\DB;
-use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\Hash;
-
-
+use Livewire\Attributes\Layout;
+use Livewire\Component;
 
 class TransactionCreate extends Component
 {
     // Properti Modal Pelanggan Baru
     public $isNewCustomerModalOpen = false;
-    public $new_name, $new_email, $new_phone;
+
+    public $new_name;
+
+    public $new_email;
+
+    public $new_phone;
+
     public $new_password = 'password'; // Password default untuk pelanggan baru
 
     // Properti Modal Kendaraan Baru
     public $isNewVehicleModalOpen = false;
-    public $new_license_plate, $new_brand, $new_model, $new_year;
+
+    public $new_license_plate;
+
+    public $new_brand;
+
+    public $new_model;
+
+    public $new_year;
 
     // Bagian Pelanggan & Kendaraan
     public $customer_search = '';
+
     public $customers = []; // Hasil pencarian pelanggan
 
     public $selected_customer_id;
+
     public $selected_customer_name;
+
     public $selected_vehicle_id;
+
     public $vehicles = []; // Kendaraan milik pelanggan
 
     // Bagian Mekanik
     public $mechanics = [];
+
     public $selected_mechanic_id;
 
-    //Bagian Item
+    // Bagian Item
     public $item_search = '';
-    public $item_results = [];
 
+    public $item_results = [];
 
     // Bagian Keranjang
     public $cart = [];
+
     public $total = 0;
+
     public $notes = '';
 
     /**
@@ -69,34 +87,19 @@ class TransactionCreate extends Component
         $booking = Booking::find($bookingId);
 
         if ($booking) {
+            $customer = User::findOrFail($booking->customer_id);
             // 1. Isi Data Pelanggan (sesuaikan nama variabel property Anda, misal $customer_id atau $selectedUser)
-            $this->selected_customer_id = $booking->user_id;
+            $this->selected_customer_id = $customer->id;
+            $this->selected_customer_name = $customer->name;
 
             // Trigger update jika ada logic livewire (updatedCustomerId)
             // $this->updatedCustomerId();
 
+            $vehicles = $customer->vehicles;
             // 2. Isi Data Kendaraan
+            $this->vehicles = $vehicles;
             $this->selected_vehicle_id = $booking->vehicle_id;
 
-            // 3. Masukkan Service yang dibooking ke Keranjang (Cart)
-            // Asumsi booking punya kolom 'service_id'
-            if ($booking->service_id) {
-                $service = Service::find($booking->service_id);
-                if ($service) {
-                    // Sesuaikan struktur array cart ini dengan sistem keranjang Anda
-                    $this->cart[] = [
-                        'id' => $service->id,
-                        'name' => $service->service_name, // atau $service->name
-                        'price' => $service->price,
-                        'qty' => 1,
-                        'subtotal' => $service->price,
-                        'type' => 'service' // penanda bahwa ini jasa
-                    ];
-
-                    // Jangan lupa hitung ulang total harga transaksi
-                    $this->calculateTotal();
-                }
-            }
         }
     }
 
@@ -129,7 +132,7 @@ class TransactionCreate extends Component
             'email' => $this->new_email,
             'phone' => $this->new_phone,
             'password' => Hash::make($this->new_password),
-            'role' => 'pelanggan'
+            'role' => 'pelanggan',
         ]);
 
         // Tutup modal
@@ -147,8 +150,9 @@ class TransactionCreate extends Component
      */
     public function openNewVehicleModal()
     {
-        if (!$this->selected_customer_id) {
+        if (! $this->selected_customer_id) {
             session()->flash('error', 'Pilih pelanggan terlebih dahulu.');
+
             return;
         }
         $this->resetErrorBag();
@@ -196,6 +200,7 @@ class TransactionCreate extends Component
     {
         if (strlen($value) < 2) {
             $this->customers = []; // Kosongkan hasil jika input < 2 huruf
+
             return;
         }
 
@@ -245,6 +250,7 @@ class TransactionCreate extends Component
     {
         if (strlen($value) < 2) {
             $this->item_results = [];
+
             return;
         }
 
@@ -258,7 +264,7 @@ class TransactionCreate extends Component
                 'name' => $service->name,
                 'price' => $service->price,
                 'type' => 'service',
-                'stock' => null // Jasa tidak punya stok
+                'stock' => null, // Jasa tidak punya stok
             ];
         }
 
@@ -272,7 +278,7 @@ class TransactionCreate extends Component
                 'name' => $sparepart->name,
                 'price' => $sparepart->sale_price,
                 'type' => 'sparepart',
-                'stock' => $sparepart->stock
+                'stock' => $sparepart->stock,
             ];
         }
     }
@@ -292,14 +298,17 @@ class TransactionCreate extends Component
                         $this->cart[$key]['quantity']++;
                         $this->calculateTotal();
                         $this->resetItemSearch();
+
                         return;
                     } else {
                         session()->flash('error', 'Stok sparepart tidak mencukupi.');
+
                         return;
                     }
                 } else {
                     // Jika jasa, jangan tambahkan (karena jasa tidak perlu kuantitas > 1)
                     session()->flash('error', 'Jasa servis sudah ada di keranjang.');
+
                     return;
                 }
             }
@@ -313,12 +322,13 @@ class TransactionCreate extends Component
                 'name' => $item->name,
                 'price' => $item->price,
                 'quantity' => 1,
-                'type' => 'service'
+                'type' => 'service',
             ];
         } else { // type == 'sparepart'
             $item = Sparepart::find($id);
             if ($item->stock < 1) {
                 session()->flash('error', 'Stok sparepart habis.');
+
                 return;
             }
             $this->cart[] = [
@@ -326,7 +336,7 @@ class TransactionCreate extends Component
                 'name' => $item->name,
                 'price' => $item->sale_price,
                 'quantity' => 1,
-                'type' => 'sparepart'
+                'type' => 'sparepart',
             ];
         }
 
@@ -367,8 +377,9 @@ class TransactionCreate extends Component
     public function saveTransaction()
     {
         // 1. Validasi Sederhana
-        if (count($this->cart) == 0 || !$this->selected_customer_id || !$this->selected_vehicle_id || !$this->selected_mechanic_id) {
+        if (count($this->cart) == 0 || ! $this->selected_customer_id || ! $this->selected_vehicle_id || ! $this->selected_mechanic_id) {
             session()->flash('error', 'Harap lengkapi semua data (Pelanggan, Kendaraan, Mekanik, dan Item).');
+
             return;
         }
 
@@ -406,7 +417,7 @@ class TransactionCreate extends Component
                     $sparepart = Sparepart::find($item['id']);
                     if ($sparepart->stock < $item['quantity']) {
                         // Jika stok tidak cukup, batalkan semua
-                        throw new \Exception('Stok untuk ' . $sparepart->name . ' tidak mencukupi.');
+                        throw new \Exception('Stok untuk '.$sparepart->name.' tidak mencukupi.');
                     }
                     $sparepart->decrement('stock', $item['quantity']);
                 }
@@ -423,7 +434,7 @@ class TransactionCreate extends Component
                 $booking = Booking::find(request('booking_id'));
                 if ($booking) {
                     $booking->update([
-                        'status' => 'completed' // atau 'processed'
+                        'status' => 'completed', // atau 'processed'
                     ]);
                 }
             }
@@ -434,7 +445,7 @@ class TransactionCreate extends Component
         } catch (\Exception $e) {
             // 8. Jika ada error, rollback semua
             DB::rollBack();
-            session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 

@@ -2,12 +2,12 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\Gallery; // 👈 Gunakan Model Gallery
-use Illuminate\Http\Request;
-use Livewire\WithFileUploads; // 👈 1. IMPORT Trait File Uploads
-use Illuminate\Support\Facades\Storage; // 👈 2. IMPORT Storage Facade
-use Livewire\Attributes\Layout;
+use App\Models\Gallery;
+use Illuminate\Http\Request; // 👈 Gunakan Model Gallery
+use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Layout; // 👈 1. IMPORT Trait File Uploads
+use Livewire\Component; // 👈 2. IMPORT Storage Facade
+use Livewire\WithFileUploads;
 
 class GalleryManagement extends Component
 {
@@ -15,6 +15,7 @@ class GalleryManagement extends Component
 
     // Properti untuk form
     public $image; // Properti untuk file upload
+
     public $caption;
 
     // Aturan validasi
@@ -29,7 +30,7 @@ class GalleryManagement extends Component
         $galleries = Gallery::latest()->get(); // Ambil semua gambar
 
         return view('livewire.gallery-management', [
-            'galleries' => $galleries
+            'galleries' => $galleries,
         ]);
     }
 
@@ -39,12 +40,12 @@ class GalleryManagement extends Component
     public function store(Request $request)
     {
         $this->validate();
-        $path = $this->image->store('galleries');
+        $path = $this->image->store('galleries', 'public'); // Simpan di storage/app/public/galleries
 
         // Simpan path ke database
         Gallery::create([
             'image_path' => $path,
-            'caption' => $this->caption
+            'caption' => $this->caption,
         ]);
 
         session()->flash('message', 'Gambar berhasil diunggah.');

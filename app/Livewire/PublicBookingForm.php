@@ -2,24 +2,31 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
+use App\Models\Booking;
 use App\Models\User;
 use App\Models\Vehicle;
-use App\Models\Booking;
 use Illuminate\Support\Facades\Hash;
-use Livewire\Attributes\Layout;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Layout;
+use Livewire\Component;
 
 class PublicBookingForm extends Component
 {
     // Properti untuk form
     public $name;
+
     public $email;
+
     public $phone;
+
     public $license_plate;
+
     public $brand;
+
     public $model;
+
     public $service_description;
+
     public $booking_date; // Akan jadi tipe datetime-local
 
     // Aturan validasi
@@ -50,12 +57,12 @@ class PublicBookingForm extends Component
         // 1. Cari atau Buat Pelanggan (User)
         // Kita gunakan email sebagai unik, tapi bisa juga phone
         $customer = User::firstOrCreate(
-            ['email' => $this->email],
+            ['email' => $this->email, 'phone' => $this->phone],
             [
                 'name' => $this->name,
                 'phone' => $this->phone,
                 'role' => 'pelanggan',
-                'password' => Hash::make(Str::random(10)) // Buat password acak
+                'password' => Hash::make(Str::random(10)), // Buat password acak
             ]
         );
 
@@ -67,7 +74,7 @@ class PublicBookingForm extends Component
                 'user_id' => $customer->id,
                 'brand' => $this->brand,
                 'model' => $this->model,
-                'year' => date('Y') // Asumsi tahun sekarang, bisa dibuat field
+                'year' => date('Y'), // Asumsi tahun sekarang, bisa dibuat field
             ]
         );
 
@@ -76,6 +83,7 @@ class PublicBookingForm extends Component
         // Untuk skripsi ini, kita asumsikan no. polisi = 1 pemilik
         if ($vehicle->user_id != $customer->id) {
             session()->flash('error', 'Nomor polisi ini sudah terdaftar atas nama pelanggan lain.');
+
             return;
         }
 
@@ -85,7 +93,7 @@ class PublicBookingForm extends Component
             'vehicle_id' => $vehicle->id,
             'booking_date' => $this->booking_date,
             'service_description' => $this->service_description,
-            'status' => 'pending' // Status awal selalu pending
+            'status' => 'pending', // Status awal selalu pending
         ]);
 
         // 4. Kirim pesan sukses dan reset form
