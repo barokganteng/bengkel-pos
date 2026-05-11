@@ -99,11 +99,11 @@ class TransactionCreate extends Component
     {
         $queue = ServiceHistory::with(['customer', 'vehicle'])
             ->where('id', $queueId)
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending', 'in_progress'])
             ->first();
 
         if (! $queue) {
-            session()->flash('error', 'Data antrean tidak ditemukan atau sudah diproses.');
+            session()->flash('error', 'Data antrean tidak ditemukan atau sudah masuk tahap transaksi/pembayaran.');
 
             return;
         }

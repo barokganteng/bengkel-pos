@@ -15,8 +15,8 @@ class TransactionList extends Component
     private const STATUS_LABELS = [
         'pending' => 'Antrean',
         'in_progress' => 'Pengerjaan',
-        'done' => 'Transaksi',
-        'paid' => 'Pembayaran',
+        'done' => 'Pembayaran',
+        'paid' => 'Selesai',
     ];
 
     private const STATUS_CLASSES = [
@@ -102,9 +102,26 @@ class TransactionList extends Component
 
         $transaction = ServiceHistory::find($id);
         if ($transaction) {
+            $validTransitions = [
+                'pending' => ['in_progress'],
+                'in_progress' => ['done'],
+                'done' => ['paid'],
+                'paid' => [],
+            ];
+
+            if ($transaction->status === $status) {
+                return;
+            }
+
+            if (! in_array($status, $validTransitions[$transaction->status] ?? [], true)) {
+                session()->flash('error', 'Transisi status tidak valid. Ikuti urutan antrean > pengerjaan > pembayaran > selesai.');
+
+                return;
+            }
+
             $transaction->status = $status;
             $transaction->save();
-            session()->flash('message', 'Status transaksi #' . $id . ' berhasil diubah menjadi ' . $status);
+            session()->flash('message', 'Status transaksi #' . $id . ' berhasil diubah menjadi ' . $this->statusLabel($status));
         }
     }
 
@@ -118,9 +135,46 @@ class TransactionList extends Component
         return self::STATUS_CLASSES[$status] ?? 'bg-secondary text-white';
     }
 
+    public function timelineStages(string $status, bool $compact = false): array
+    {
+        $statuses = array_keys(self::STATUS_LABELS);
+        $currentIndex = array_search($status, $statuses, true);
+        if ($currentIndex === false) {
+            $currentIndex = -1;
+        }
+
+        $timeline = [];
+        foreach ($statuses as $index => $code) {
+            $isCurrent = $index === $currentIndex;
+            $isDone = $index < $currentIndex;
+
+            $timeline[] = [
+                'label' => self::STATUS_LABELS[$code],
+                'short_label' => (string) ($index + 1),
+                'title' => ($index + 1).'. '.self::STATUS_LABELS[$code],
+                'class' => $isCurrent
+                    ? 'bg-primary text-white'
+                    : ($isDone ? 'bg-success text-white' : 'bg-light text-dark border'),
+                'compact' => $compact,
+            ];
+        }
+
+        return $timeline;
+    }
+
     public function isQueueDraft($transaction): bool
     {
-        return $transaction->status === 'pending' && (int) $transaction->total_price === 0;
+        return in_array($transaction->status, ['pending', 'in_progress']) && (int) $transaction->total_price === 0;
+    }
+
+    public function startWork($id)
+    {
+        $this->updateTransactionStatus($id, 'in_progress');
+    }
+
+    public function markAsDone($id)
+    {
+        $this->updateTransactionStatus($id, 'paid');
     }
 
     /**

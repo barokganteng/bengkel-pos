@@ -26,8 +26,8 @@
                         <option value="">Semua Status</option>
                         <option value="pending">Antrean</option>
                         <option value="in_progress">Pengerjaan</option>
-                        <option value="done">Transaksi</option>
-                        <option value="paid">Pembayaran</option>
+                        <option value="done">Pembayaran</option>
+                        <option value="paid">Selesai</option>
                     </select>
                 </div>
                 <div class="col-md-4">
@@ -69,6 +69,17 @@
                                     <span class="badge {{ $this->statusBadgeClass($tx->status) }}">
                                         {{ $this->statusLabel($tx->status) }}
                                     </span>
+                                    <div class="mt-1 d-flex flex-wrap gap-1">
+                                        @foreach ($this->timelineStages($tx->status, true) as $stage)
+                                            <span class="badge {{ $stage['class'] }}"
+                                                title="{{ $stage['title'] }}">{{ $stage['short_label'] }}</span>
+                                        @endforeach
+                                    </div>
+                                    @if ($this->isQueueDraft($tx))
+                                        <div class="mt-1">
+                                            <span class="badge bg-light text-dark border">Draft Antrean</span>
+                                        </div>
+                                    @endif
                                 </td>
 
                                 <td>
@@ -77,6 +88,20 @@
                                             class="btn btn-sm btn-outline-primary mb-1 w-100">
                                             Lanjutkan Antrean
                                         </a>
+
+                                        @if ($tx->status == 'pending')
+                                            <button type="button" class="btn btn-sm btn-info text-white mb-1 w-100"
+                                                wire:click="startWork({{ $tx->id }})">
+                                                Mulai Pengerjaan
+                                            </button>
+                                        @endif
+                                    @endif
+
+                                    @if ($tx->status == 'done')
+                                        <button type="button" class="btn btn-sm btn-success mb-1 w-100"
+                                            wire:click="markAsDone({{ $tx->id }})">
+                                            Selesaikan
+                                        </button>
                                     @endif
 
                                     <div class="dropdown">
@@ -85,18 +110,21 @@
                                             Ubah Status
                                         </button>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#"
-                                                wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'pending')">Set
-                                                Antrean</a>
-                                            <a class="dropdown-item" href="#"
-                                                wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'in_progress')">Set
-                                                Pengerjaan</a>
-                                            <a class="dropdown-item" href="#"
-                                                wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'done')">Set
-                                                Transaksi</a>
-                                            <a class="dropdown-item" href="#"
-                                                wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'paid')">Set
-                                                Pembayaran</a>
+                                            @if ($tx->status == 'pending')
+                                                <a class="dropdown-item" href="#"
+                                                    wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'in_progress')">Lanjut
+                                                    ke Pengerjaan</a>
+                                            @elseif ($tx->status == 'in_progress')
+                                                <a class="dropdown-item" href="#"
+                                                    wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'done')">Lanjut ke
+                                                    Pembayaran</a>
+                                            @elseif ($tx->status == 'done')
+                                                <a class="dropdown-item" href="#"
+                                                    wire:click.prevent="updateTransactionStatus({{ $tx->id }}, 'paid')">Lanjut ke
+                                                    Selesai</a>
+                                            @else
+                                                <span class="dropdown-item text-muted">Sudah di tahap akhir</span>
+                                            @endif
                                         </div>
                                     </div>
                                 </td>
@@ -141,6 +169,12 @@
                                     class="badge {{ $this->statusBadgeClass($selectedTransaction->status) }}">
                                     {{ $this->statusLabel($selectedTransaction->status) }}
                                 </span>
+                                <div class="mt-2 d-flex flex-wrap gap-1 justify-content-md-end">
+                                    @foreach ($this->timelineStages($selectedTransaction->status) as $stage)
+                                        <span class="badge {{ $stage['class'] }}"
+                                            title="{{ $stage['title'] }}">{{ $stage['label'] }}</span>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                         <div class="row mb-3">
