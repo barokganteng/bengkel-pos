@@ -11,6 +11,8 @@ class ServiceManagement extends Component
 {
     use WithPagination;
 
+    protected $paginationTheme = 'bootstrap';
+
     // Properti untuk data binding form
     public $name, $price;
     public $service_id; // Untuk menyimpan ID saat edit

@@ -15,6 +15,8 @@ class TransactionList extends Component
 {
     use WithPagination;
 
+    protected $paginationTheme = 'bootstrap';
+
     private const STATUS_LABELS = [
         'pending' => 'Antrean',
         'in_progress' => 'Pengerjaan',

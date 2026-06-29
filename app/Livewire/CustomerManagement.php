@@ -12,6 +12,8 @@ class CustomerManagement extends Component
 {
     use WithPagination;
 
+    protected $paginationTheme = 'bootstrap';
+
     // Properti untuk data binding form
     public $name, $email, $phone, $password;
     public $customer_id; // Untuk menyimpan ID saat edit

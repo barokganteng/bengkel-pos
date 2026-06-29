@@ -11,6 +11,8 @@ class BookingManagement extends Component
 {
     use WithPagination;
 
+    protected $paginationTheme = 'bootstrap';
+
     // Properti untuk filter
     public $filterStatus = '';
     public $filterDate = '';

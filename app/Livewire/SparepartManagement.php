@@ -12,6 +12,8 @@ class SparepartManagement extends Component
 {
     use WithPagination;
 
+    protected $paginationTheme = 'bootstrap';
+
     // Properti untuk data binding form
     #[Validate('required|min:3')]
     public $name;
