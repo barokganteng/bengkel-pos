@@ -51,6 +51,7 @@
                             <th>Kendaraan</th>
                             <th>Mekanik</th>
                             <th>Total</th>
+                            <th>Bukti Bayar</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -65,6 +66,15 @@
                                 <td>{{ $tx->vehicle->license_plate ?? 'N/A' }}</td>
                                 <td>{{ $tx->mechanic->name ?? 'N/A' }}</td>
                                 <td>Rp {{ number_format($tx->total_price, 0, ',', '.') }}</td>
+                                <td>
+                                    @if ($tx->payment_proof)
+                                        <a href="{{ Storage::url($tx->payment_proof) }}" target="_blank"
+                                            class="btn btn-sm btn-outline-success">
+                                            Lihat Bukti
+                                        </a>
+                                    @else
+                                        <span class="text-muted">Belum ada</span>
+                                    @endif
                                 <td>
                                     <span class="badge {{ $this->statusBadgeClass($tx->status) }}">
                                         {{ $this->statusLabel($tx->status) }}
