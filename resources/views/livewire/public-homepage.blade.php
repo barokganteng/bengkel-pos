@@ -38,7 +38,6 @@
                         <div class="card-body">
                             <i class="fas fa-fw fa-wrench fa-3x text-primary mb-3"></i>
                             <h4 class="card-title">{{ $service->name }}</h4>
-                            <p class="card-text text-muted">Mulai dari Rp {{ number_format($service->price) }}</p>
                         </div>
                     </div>
                 </div>
