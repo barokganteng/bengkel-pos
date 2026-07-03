@@ -11,6 +11,10 @@
                     @if (session()->has('message'))
                         <div class="alert alert-success">
                             {{ session('message') }}
+                            @if (session()->has('queue_number'))
+                                <hr>
+                                <h4 class="alert-heading text-center mb-0">Nomor Antrean Anda: <strong>{{ session('queue_number') }}</strong></h4>
+                            @endif
                         </div>
                     @endif
                     @if (session()->has('error'))
@@ -40,7 +44,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="phone" class="form-label">No. WhatsApp</label>
-                                <input type_text wire:model="phone" class="form-control" id="phone"
+                                <input type="text" wire:model="phone" class="form-control" id="phone"
                                     placeholder="cth: 0812345...">
                                 @error('phone')
                                     <span class="text-danger">{{ $message }}</span>
