@@ -47,7 +47,6 @@
                             <th>Tanggal Booking</th>
                             <th>Pelanggan</th>
                             <th>Kendaraan</th>
-                            <th>Keterangan Servis</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -60,16 +59,24 @@
                                 </td>
                                 <td>{{ $booking->customer->name ?? 'N/A' }}</td>
                                 <td>{{ $booking->vehicle->license_plate ?? 'N/A' }}</td>
-                                <td>{{ $booking->service_description ?? '-' }}</td>
                                 <td>
                                     <span class="badge {{ $this->statusBadgeClass($booking->status) }}">
                                         {{ $this->statusLabel($booking->status) }}
                                     </span>
                                 </td>
                                 <td>
+                                    @if ($booking->status == 'pending')
+                                        <button wire:click="updateBookingStatus({{ $booking->id }}, 'confirmed')" class="btn btn-info btn-sm text-white">
+                                            <i class="fas fa-check"></i> Konfirmasi
+                                        </button>
+                                        <button wire:click="updateBookingStatus({{ $booking->id }}, 'cancelled')" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-times"></i> Batal
+                                        </button>
+                                    @endif
+                                    
                                     @if ($booking->status == 'pending' || $booking->status == 'confirmed')
                                         <a href="{{ route('transaksi.create', ['booking_id' => $booking->id]) }}"
-                                            class="btn btn-success btn-sm">
+                                            class="btn btn-success btn-sm mt-1">
                                             <i class="fas fa-cash-register"></i> Proses
                                         </a>
                                     @endif
