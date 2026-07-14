@@ -84,6 +84,35 @@ class TransactionList extends Component
         ]);
     }
 
+    public function exportPdf()
+    {
+        $query = ServiceHistory::query()->with(['customer', 'vehicle', 'mechanic']);
+
+        if (! empty($this->search)) {
+            $query->whereHas('customer', function ($q) {
+                $q->where('name', 'like', '%'.$this->search.'%');
+            })->orWhereHas('vehicle', function ($q) {
+                $q->where('license_plate', 'like', '%'.$this->search.'%');
+            });
+        }
+
+        if (! empty($this->filterStatus)) {
+            $query->where('status', $this->filterStatus);
+        }
+
+        if (! empty($this->filterDate)) {
+            $query->whereDate('service_date', $this->filterDate);
+        }
+
+        $transactions = $query->latest('service_date')->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.transactions', ['transactions' => $transactions]);
+        
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, 'laporan-keuangan.pdf');
+    }
+
     /**
      * Tampilkan modal detail transaksi
      */

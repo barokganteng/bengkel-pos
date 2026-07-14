@@ -5,6 +5,7 @@
             <h3>Manajemen Pelanggan</h3>
         </div>
         <div class="col-md-6 text-end">
+            <button wire:click="exportPdf()" class="btn btn-secondary me-2">Print PDF</button>
             <button wire:click="create()" class="btn btn-primary">Tambah Pelanggan Baru</button>
         </div>
     </div>

@@ -72,6 +72,13 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Alamat Lengkap</label>
+                            <textarea wire:model="address" class="form-control" id="address" rows="3" placeholder="Masukkan alamat lengkap Anda"></textarea>
+                            @error('address')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
 
                         <h5 class="mt-4">3. Data Kendaraan</h5>
                         <hr>
