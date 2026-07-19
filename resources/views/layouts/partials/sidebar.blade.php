@@ -4,7 +4,7 @@
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-fw fa-cogs"></i>
         </div>
-        <div class="sidebar-brand-text mx-3">Bengkel POS</div>
+        <div class="sidebar-brand-text mx-3">MUDA OTOMOTIF</div>
     </a>
 
     <hr class="sidebar-divider my-0">

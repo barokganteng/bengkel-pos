@@ -95,16 +95,19 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <h4>Alamat Bengkel</h4>
                 <p>
-                    Jl. Urip Sumoharjo, Podosugih<br>
-                    Kec. Pekalongan Bar., Kota Pekalongan<br>
+                    <strong>Alamat:</strong><br>
+                    Jl. Otto Iskandardinata Depan Musolla Miftahul Hidayah<br>
+                    Kel. Soko-Duwet, Pekalongan selatan<br>
                     Jawa Tengah 51111
-                    <br><br>
+                    <br>
                     <strong>Jam Buka:</strong><br>
                     Senin - Sabtu: 08:00 - 17:00
+                    <br>
+                    <strong>Telpon:</strong><br>
+                    0857-6246-7437
                 </p>
-                <a href="{{ env('GMAPS_SHARE_URL') ?: 'https://maps.google.com/?q=Jl.+Urip+Sumoharjo,+Podosugih,+Pekalongan' }}" target="_blank" class="btn btn-primary btn-lg">
+                <a href="{{ env('GMAPS_SHARE_URL') ?: 'https://maps.app.goo.gl/hvx3RaeAx2FXVNfN7' }}" target="_blank" class="btn btn-primary btn-lg">
                     <i class="fas fa-fw fa-map-marker-alt"></i>
                     Buka di Google Maps
                 </a>

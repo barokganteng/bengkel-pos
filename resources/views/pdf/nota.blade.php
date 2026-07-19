@@ -78,7 +78,8 @@
         <div class="header">
             <h1>NOTA SERVIS</h1>
             <p>{{ config('app.name', 'Bengkel POS') }}</p>
-            <p>Jl. Urip Sumoharjo, Pekalongan (Ganti dengan alamat Anda)</p>
+            <p>Jl. Otto Iskandardinata Depan Musolla Miftahul Hidayah, Kel. Soko-Duwet, Pekalongan selatan</p>
+            <p>Hubungi : 0857-6246-7437</p>
         </div>
 
         <div class="info">
@@ -131,6 +132,7 @@
             </div>
         @endif
 
+        <p style="text-align: center;">Jika ada kendala atau pertanyaan, silakan hubungi kami atau kembali ke bengkel kami!</p>
         <p style="text-align: center;">Terima kasih telah servis di bengkel kami!</p>
     </div>
 </body>

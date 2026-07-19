@@ -11,7 +11,7 @@
                 aria-haspopup="true" aria-expanded="false">
                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->name }}</span>
                 <img class="img-profile rounded-circle"
-                    src="https://via.placeholder.com/60/4E73DF/FFFFFF?text={{ substr(Auth::user()->name, 0, 1) }}">
+                    src="{{ asset('img/User-avatar.svg') }}" alt="User Image">
             </a>
             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
 

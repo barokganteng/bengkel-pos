@@ -18,7 +18,7 @@
                     </a>
                     @if ($gallery->caption)
                         <div class="card-body text-center">
-                            <p class="card-text">{{ $gallery->caption }}</p>
+                            <p class="card-text fw-bold fs-4">{{ $gallery->caption }}</p>
                         </div>
                     @endif
                 </div>
