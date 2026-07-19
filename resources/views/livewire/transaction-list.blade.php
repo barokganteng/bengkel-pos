@@ -1,8 +1,11 @@
 <div>
     {{-- 1. Header Halaman --}}
     <div class="row mb-3">
-        <div class="col-md-12">
+        <div class="col-md-6">
             <h3>Riwayat Transaksi Servis</h3>
+        </div>
+        <div class="col-md-6 text-end text-md-right">
+            <button wire:click="exportPdf()" class="btn btn-secondary">Print Laporan</button>
         </div>
     </div>
 

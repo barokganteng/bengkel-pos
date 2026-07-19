@@ -18,6 +18,8 @@ class PublicBookingForm extends Component
     public $email;
 
     public $phone;
+    
+    public $address;
 
     public $license_plate;
 
@@ -37,6 +39,7 @@ class PublicBookingForm extends Component
         'name' => 'required|string|min:3',
         'email' => 'nullable|email',
         'phone' => 'required|string',
+        'address' => 'required|string',
         'license_plate' => 'required|string',
         'brand' => 'required|string', // Merk
         'model' => 'required|string', // Model
@@ -145,6 +148,7 @@ class PublicBookingForm extends Component
             'customer_id' => $customer->id,
             'vehicle_id' => $vehicle->id,
             'booking_date' => $this->booking_date,
+            'address' => $this->address,
             'status' => 'pending', // Status awal selalu pending
         ]);
         
