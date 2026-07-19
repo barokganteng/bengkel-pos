@@ -46,6 +46,7 @@
                             <th>ID</th>
                             <th>Tanggal Booking</th>
                             <th>Pelanggan</th>
+                            <th>Alamat</th>
                             <th>Kendaraan</th>
                             <th>Status</th>
                             <th>Aksi</th>
@@ -58,6 +59,7 @@
                                 <td>{{ $booking->booking_date ? \Carbon\Carbon::parse($booking->booking_date)->format('d M Y H:i') : '-' }}
                                 </td>
                                 <td>{{ $booking->customer->name ?? 'N/A' }}</td>
+                                <td>{{ $booking->address ?? '-' }}</td>
                                 <td>{{ $booking->vehicle->license_plate ?? 'N/A' }}</td>
                                 <td>
                                     <span class="badge {{ $this->statusBadgeClass($booking->status) }}">

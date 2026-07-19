@@ -53,6 +53,22 @@ class CustomerManagement extends Component
         ]);
     }
 
+    public function exportPdf()
+    {
+        $customers = User::customer()
+            ->where(function ($query) {
+                $query->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('email', 'like', '%' . $this->search . '%');
+            })
+            ->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.customers', ['customers' => $customers]);
+        
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, 'data-pelanggan.pdf');
+    }
+
     // Membuka modal untuk membuat data baru
     public function create()
     {
